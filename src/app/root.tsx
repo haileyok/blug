@@ -90,7 +90,7 @@ export function ErrorBoundary() {
       </h1>
       <div className="p-10">
         <img
-          src="/public/monkey.jpg"
+          src="/monkey.jpg"
           alt="Monkey muppet meme image"
           className="rounded-md"
         />
