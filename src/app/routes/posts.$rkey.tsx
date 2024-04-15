@@ -1,3 +1,4 @@
+import React from 'react'
 import {useLoaderData} from '@remix-run/react'
 import Markdown, {Components} from 'react-markdown'
 import {WhtwndBlogEntryView} from '../../types'
