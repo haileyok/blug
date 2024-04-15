@@ -1,0 +1,19 @@
+{
+  "root": true,
+  "extends": [ "plugin:react/recommended", "prettier" ],
+  "parser": "@typescript-eslint/parser",
+  "plugins": [ "@typescript-eslint", "react" ],
+  "rules": {
+    "prettier/prettier": 0,
+    "react/no-unescaped-entities": 0,
+    "react/react-in-jsx-scope": 0
+  },
+  "ignorePatterns": [ "node_modules" ],
+  "settings": {
+    "componentWrapperFunctions": [ "observer" ]
+  },
+  "parserOptions": {
+    "sourceType": "module",
+    "ecmaVersion": "latest"
+  }
+}
