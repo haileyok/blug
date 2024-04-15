@@ -3,6 +3,7 @@ import Markdown, {Components} from 'react-markdown'
 import {WhtwndBlogEntryView} from '../../types'
 import {getPost} from '../../atproto'
 import {json, LoaderFunctionArgs} from '@remix-run/node'
+import {Link} from '../components/link'
 
 export const loader = async ({params}: LoaderFunctionArgs) => {
   const {rkey} = params
@@ -46,27 +47,6 @@ function Error() {
   )
 }
 
-function Placeholder() {
-  return (
-    <div className="container mx-auto pt-10 md:pt-20 pb-20">
-      <div className="animate-pulse gap-4 py-3">
-        <div className="flex w-full flex-col gap-2">
-          <div className="h-14 bg-theme-100 rounded-md"></div>
-          <div className="w-96 h-14 bg-theme-100 rounded-md"></div>
-          <div className="py-8" />
-          <div className="w-full h-4 bg-theme-300 rounded-md"></div>
-          <div className="w-full h-4 bg-theme-300 rounded-md"></div>
-          <div className="w-full h-4 bg-theme-300 rounded-md"></div>
-          <div className="w-44 h-4 bg-theme-300 rounded-md"></div>
-          <div className="py-4" />
-          <div className="w-full h-4 bg-theme-300 rounded-md"></div>
-          <div className="w-1/2 h-4 bg-theme-300 rounded-md"></div>
-        </div>
-      </div>
-    </div>
-  )
-}
-
 const markdownComponents: Partial<Components> = {
   h1: ({children}) => (
     <>
@@ -92,11 +72,7 @@ const markdownComponents: Partial<Components> = {
   p: ({children}) => (
     <p className="py-2 text-xl text-theme-white">{children}</p>
   ),
-  a: ({children, href}) => (
-    <a className="text-theme-500 underline" href={href as string}>
-      {children}
-    </a>
-  ),
+  a: ({children, href}) => <Link href={href as string}>{children}</Link>,
   ul: ({children}) => <ul className="list-disc pl-4">{children}</ul>,
   ol: ({children}) => <ol className="list-decimal pl-4">{children}</ol>,
   li: ({children}) => <li className="py-1">{children}</li>,
