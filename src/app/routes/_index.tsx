@@ -33,7 +33,7 @@ export default function Index() {
   return (
     <div className="container mx-auto pt-10 md:pt-20 pb-20">
       <div className="flex-col text-center">
-        <div className="flex flex-col md:flex-row justify-center items-center gap-4 md:gap-20 pb-10">
+        <div className="flex flex-col md:flex-row justify-center items-center gap-4 md:gap-20 pb-4 md:pb-8">
           {profile ? (
             <img
               className="rounded-full w-32 h-32"
@@ -45,8 +45,8 @@ export default function Index() {
           )}
           <h1 className="text-5xl md:text-6xl font-bold">It's Hailey! 👋</h1>
         </div>
-        <p className="text-3xl text-theme-300">
-          react native, nonsense, and maybe something serious (probably not)
+        <p className="text-2xl text-theme-300">
+          react native, bluesky, nonsense
         </p>
       </div>
       <div className="flex flex-col gap-4 pt-14">

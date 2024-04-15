@@ -2,14 +2,16 @@ import React from 'react'
 import {useLoaderData} from '@remix-run/react'
 import Markdown, {Components} from 'react-markdown'
 import {WhtwndBlogEntryView} from '../../types'
-import {getPost} from '../../atproto'
+import {getPost, getProfile} from '../../atproto'
 import {json, LoaderFunctionArgs, MetaFunction} from '@remix-run/node'
 import {Link} from '../components/link'
+import {AppBskyActorDefs} from '@atproto/api'
 
 export const loader = async ({params}: LoaderFunctionArgs) => {
   const {rkey} = params
   const post = await getPost(rkey!)
-  return json({post})
+  const profile = await getProfile()
+  return json({post, profile})
 }
 
 export const meta: MetaFunction<typeof loader> = ({data}) => {
@@ -38,7 +40,10 @@ export const meta: MetaFunction<typeof loader> = ({data}) => {
   ]
 }
 export default function Posts() {
-  const {post} = useLoaderData<{post: WhtwndBlogEntryView}>()
+  const {post, profile} = useLoaderData<{
+    post: WhtwndBlogEntryView
+    profile: AppBskyActorDefs.ProfileViewDetailed
+  }>()
 
   if (!post) {
     return <Error />
@@ -46,10 +51,19 @@ export default function Posts() {
 
   return (
     <div className="container mx-auto pt-10 md:pt-20 pb-20">
-      <h1 className="text-5xl md:text-6xl font-bold text-center">
-        {post.title}
-      </h1>
-      <div className="py-4 md:py-8" />
+      <div className="flex flex-col text-center gap-4">
+        <h1 className="text-5xl md:text-6xl font-bold">{post.title}</h1>
+        <span className="text-md italic text-theme-300">
+          Poorly written by the one and only {profile.displayName} on{' '}
+          {new Date(post.createdAt).toLocaleDateString(undefined, {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+          })}
+        </span>
+      </div>
+
+      <div className="py-4" />
       <div>
         <Markdown components={markdownComponents} className="break-words">
           {post.content}
@@ -111,10 +125,10 @@ const markdownComponents: Partial<Components> = {
     </blockquote>
   ),
   code: ({children}) => (
-    <code className="bg-theme-900 px-1 rounded-md">{children}</code>
+    <code className="bg-theme-950 px-1 rounded-md">{children}</code>
   ),
   pre: ({children}) => (
-    <pre className="bg-theme-900 p-2 rounded-md overflow-x-auto my-4">
+    <pre className="bg-theme-950 p-2 rounded-md overflow-x-auto my-4">
       {children}
     </pre>
   ),
