@@ -51,7 +51,9 @@ export default function Posts() {
       </h1>
       <div className="py-4 md:py-8" />
       <div>
-        <Markdown components={markdownComponents}>{post.content}</Markdown>
+        <Markdown components={markdownComponents} className="break-words">
+          {post.content}
+        </Markdown>
       </div>
     </div>
   )
