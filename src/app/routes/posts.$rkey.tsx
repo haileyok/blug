@@ -3,13 +3,39 @@ import {useLoaderData} from '@remix-run/react'
 import Markdown, {Components} from 'react-markdown'
 import {WhtwndBlogEntryView} from '../../types'
 import {getPost} from '../../atproto'
-import {json, LoaderFunctionArgs} from '@remix-run/node'
+import {json, LoaderFunctionArgs, MetaFunction} from '@remix-run/node'
 import {Link} from '../components/link'
 
 export const loader = async ({params}: LoaderFunctionArgs) => {
   const {rkey} = params
   const post = await getPost(rkey!)
   return json({post})
+}
+
+export const meta: MetaFunction<typeof loader> = ({data}) => {
+  return [
+    {title: `${data?.post.title} | Hailey's Cool Site`},
+    {
+      name: 'description',
+      content: `${data?.post.content?.split(' ').slice(0, 100).join(' ')}...`,
+    },
+    {
+      name: 'og:title',
+      content: `${data?.post.title}`,
+    },
+    {
+      name: 'og:description',
+      content: `${data?.post.content?.split(' ').slice(0, 100).join(' ')}...`,
+    },
+    ...(data?.post.banner && data?.post.banner !== ''
+      ? [
+          {
+            name: 'og:image',
+            content: `${data?.post.banner}`,
+          },
+        ]
+      : []),
+  ]
 }
 export default function Posts() {
   const {post} = useLoaderData<{post: WhtwndBlogEntryView}>()
@@ -39,7 +65,7 @@ function Error() {
       </h1>
       <div className="p-10">
         <img
-          src="/public/monkey.jpg"
+          src="/monkey.jpg"
           alt="Monkey muppet meme image"
           className="rounded-md"
         />

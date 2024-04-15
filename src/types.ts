@@ -4,6 +4,11 @@ export interface WhtwndBlogEntryRecord {
   createdAt: string
   theme?: string
   title: string
+  ogp?: {
+    height: number | null
+    url: string | null
+    width: number | null
+  }
 }
 
 export interface WhtwndBlogEntryView {
@@ -12,6 +17,7 @@ export interface WhtwndBlogEntryView {
   title: string
   content?: string
   createdAt: string
+  banner?: string
 }
 
 export interface BskyProfileView {
