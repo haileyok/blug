@@ -10,7 +10,12 @@ export const loader = async () => {
   const posts = await getPosts(undefined)
   const profile = await getProfile()
 
-  return json({posts, profile})
+  const postsShortened = posts.map((p) => {
+    p.content = p.content?.slice(0, 300)
+    return p
+  })
+
+  return json({posts: postsShortened, profile})
 }
 
 export const meta: MetaFunction = () => {
