@@ -10,7 +10,9 @@ export const loader = async () => {
   const posts = await getPosts(undefined)
   const profile = await getProfile()
 
-  const postsShortened = posts.map((p) => {
+  const postsFiltered = posts.filter(p => !p.content?.startsWith('NOT_LIVE'))
+
+  const postsShortened = postsFiltered.map(p => {
     p.content = p.content?.slice(0, 300)
     return p
   })
