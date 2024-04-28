@@ -53,7 +53,7 @@ export default function Posts() {
     <div className="container mx-auto pt-10 md:pt-20 pb-20">
       <div className="flex flex-col text-center gap-4">
         <h1 className="text-5xl md:text-6xl font-bold">{post.title}</h1>
-        <span className="text-md italic text-theme-300">
+        <span className="text-md italic text-300">
           Poorly written by {profile.displayName} on{' '}
           {new Date(post.createdAt).toLocaleDateString(undefined, {
             year: 'numeric',
@@ -94,13 +94,13 @@ const markdownComponents: Partial<Components> = {
   h1: ({children}) => (
     <>
       <h1 className="text-3xl md:text-4xl font-bold">{children}</h1>
-      <div className="w-full h-0.5 bg-theme-300 my-2"></div>
+      <div className="w-full h-0.5 bg-300 my-2"></div>
     </>
   ),
   h2: ({children}) => (
     <>
       <h2 className="text-2xl md:text-3xl font-bold pt-6">{children}</h2>
-      <div className="w-full h-0.5 bg-theme-300 my-2"></div>
+      <div className="w-full h-0.5 bg-300 my-2"></div>
     </>
   ),
   h3: ({children}) => (
@@ -112,25 +112,21 @@ const markdownComponents: Partial<Components> = {
   h5: ({children}) => (
     <h5 className="text-base md:text-lg font-bold pt-4">{children}</h5>
   ),
-  p: ({children}) => (
-    <p className="py-2 text-xl text-theme-white">{children}</p>
-  ),
+  p: ({children}) => <p className="py-2 text-xl text-white">{children}</p>,
   a: ({children, href}) => <Link href={href as string}>{children}</Link>,
   ul: ({children}) => <ul className="list-disc pl-4">{children}</ul>,
   ol: ({children}) => <ol className="list-decimal pl-4">{children}</ol>,
   li: ({children}) => <li className="py-1">{children}</li>,
   blockquote: ({children}) => (
-    <blockquote className="border-l-4 border-theme-300 my-3 pl-4 py-1">
+    <blockquote className="border-l-4 border-300 my-3 pl-4 py-1">
       {children}
     </blockquote>
   ),
   code: ({children}) => (
-    <code className="bg-theme-950 px-1 rounded-md">{children}</code>
+    <code className="bg-975 px-1 rounded-md">{children}</code>
   ),
   pre: ({children}) => (
-    <pre className="bg-theme-950 p-2 rounded-md overflow-x-auto my-4">
-      {children}
-    </pre>
+    <pre className="bg-950 p-2 rounded-md overflow-x-auto my-4">{children}</pre>
   ),
   img: ({src, alt}) => (
     <div className="flex justify-center p-6">
@@ -141,15 +137,11 @@ const markdownComponents: Partial<Components> = {
   table: ({children}) => (
     <table className="table-auto w-full">{children}</table>
   ),
-  thead: ({children}) => <thead className="bg-theme-100">{children}</thead>,
+  thead: ({children}) => <thead className="bg-100">{children}</thead>,
   tbody: ({children}) => <tbody>{children}</tbody>,
   tr: ({children}) => <tr>{children}</tr>,
-  th: ({children}) => (
-    <th className="border border-theme-300 p-2">{children}</th>
-  ),
-  td: ({children}) => (
-    <td className="border border-theme-300 p-2">{children}</td>
-  ),
+  th: ({children}) => <th className="border border-300 p-2">{children}</th>,
+  td: ({children}) => <td className="border border-300 p-2">{children}</td>,
   strong: ({children}) => <strong className="font-bold">{children}</strong>,
   em: ({children}) => <em className="italic">{children}</em>,
   del: ({children}) => <del>{children}</del>,

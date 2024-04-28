@@ -49,7 +49,7 @@ export function Layout({children}: {children: React.ReactNode}) {
           <main>{children}</main>
         </div>
         <footer>
-          <p className="text-center text-theme-100 py-4">
+          <p className="text-center text-100 py-4">
             running on <Link href="https://atproto.com/">atprotocol</Link>
           </p>
         </footer>
@@ -73,8 +73,8 @@ function NavLink({
   selected: boolean
   children: string
 }) {
-  const topClassName = selected ? 'h-1 bg-theme-50' : 'h-1'
-  const className = selected ? 'text-theme-50' : 'text-theme-300'
+  const topClassName = selected ? 'h-1 bg-50' : 'h-1'
+  const className = selected ? 'text-50' : 'text-300'
 
   return (
     <a href={href}>
