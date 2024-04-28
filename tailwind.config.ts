@@ -4,7 +4,7 @@ export default {
   content: ['./src/app/**/*.{js,jsx,ts,tsx}'],
   theme: {
     container: {
-      padding: '2rem',
+      padding: '1.5rem',
       screens: {
         sm: '100%',
         md: '100%',
