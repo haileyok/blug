@@ -38,7 +38,7 @@ export default function Index() {
   }>()
 
   return (
-    <div className="container mx-auto pt-10 md:pt-20 pb-20">
+    <div className="container flex flex-col mx-auto pt-10 md:pt-20 pb-20 gap-10">
       <div className="flex-col text-center">
         <div className="flex flex-col md:flex-row justify-center items-center gap-4 md:gap-20 pb-4 md:pb-8">
           {profile ? (
@@ -56,36 +56,38 @@ export default function Index() {
           react native, bluesky, nonsense
         </p>
       </div>
-      <div className="flex flex-col gap-4 pt-14">
-        {posts?.map(post => <PostItem post={post} key={post.rkey} />)}
+      <div className="flex flex-col gap-4">
+        <h2 className="text-3xl font-bold">blog posts</h2>
+        <ul className="list-none">
+          {posts
+            ?.sort(
+              (a, b) =>
+                new Date(b.createdAt).getTime() -
+                new Date(a.createdAt).getTime(),
+            )
+            .map(post => <PostItem post={post} key={post.rkey} />)}
+        </ul>
       </div>
-    </div>
-  )
-}
-
-function PostContainer({children}: {children: React.ReactNode}) {
-  return (
-    <div className="flex border-1 rounded-md border-theme-900 p-4">
-      {children}
     </div>
   )
 }
 
 function PostItem({post}: {post: WhtwndBlogEntryView}) {
   return (
-    <PostContainer>
-      <div className="flex flex-col w-full gap-2">
-        <a
-          className="text-2xl md:text-3xl font-bold hover:underline"
-          href={`/posts/${post.rkey}`}>
-          <h2>{post.title}</h2>
+    <li>
+      <div className="flex">
+        <p>
+          {new Date(post.createdAt).toLocaleDateString('en-US', {
+            year: '2-digit',
+            month: '2-digit',
+            day: '2-digit',
+          })}
+          &nbsp;&nbsp;&mdash;&nbsp;&nbsp;
+        </p>
+        <a className="font-bold hover:underline" href={`/posts/${post.rkey}`}>
+          <h3 className="text-xl"> {post.title}</h3>
         </a>
-        <Markdown
-          disallowedElements={['h1', 'h2', 'h3', 'h4', 'h5', 'img']}
-          className="text-theme-300 line-clamp-3">
-          {post.content}
-        </Markdown>
       </div>
-    </PostContainer>
+    </li>
   )
 }
