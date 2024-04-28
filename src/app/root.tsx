@@ -31,27 +31,26 @@ export function Layout({children}: {children: React.ReactNode}) {
         <Meta />
         <Links />
       </head>
-      <body>
-        <div className="flex justify-center gap-4 pb-4">
-          <NavLink href="/" selected={false}>
-            Home
-          </NavLink>
-          <NavLink
-            href="https://bsky.app/profile/haileyok.com"
-            selected={false}>
-            Bluesky
-          </NavLink>
-          <NavLink href="https://github.com/haileyok" selected={false}>
-            GitHub
-          </NavLink>
+      <body className="flex flex-col h-screen justify-between">
+        <div>
+          <header className="flex justify-center gap-4 pb-4">
+            <NavLink href="/" selected={false}>
+              Home
+            </NavLink>
+            <NavLink
+              href="https://bsky.app/profile/haileyok.com"
+              selected={false}>
+              Bluesky
+            </NavLink>
+            <NavLink href="https://github.com/haileyok" selected={false}>
+              GitHub
+            </NavLink>
+          </header>
+          <main>{children}</main>
         </div>
-        <div className="flex justify-center gap-4 pb-4">{children}</div>
         <footer>
-          <p className="container mx-auto text-center text-theme-100 py-4">
-            Made with <Link href="https://remix.run/">Remix</Link>,{' '}
-            <Link href="https://tailwindcss.com/">Tailwind</Link>, and{' '}
-            <Link href="https://atproto.com/">ATProtocol</Link>. Find it{' '}
-            <Link href="https://github.com/haileyok/blug">on GitHub</Link>.
+          <p className="text-center text-theme-100 py-4">
+            running on <Link href="https://atproto.com/">atprotocol</Link>
           </p>
         </footer>
         <ScrollRestoration />
