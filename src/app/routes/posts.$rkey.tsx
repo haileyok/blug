@@ -54,7 +54,7 @@ export default function Posts() {
       <div className="flex flex-col text-center gap-4">
         <h1 className="text-5xl md:text-6xl font-bold">{post.title}</h1>
         <span className="text-md italic text-theme-300">
-          Poorly written by the one and only {profile.displayName} on{' '}
+          Poorly written by {profile.displayName} on{' '}
           {new Date(post.createdAt).toLocaleDateString(undefined, {
             year: 'numeric',
             month: 'long',
@@ -94,13 +94,13 @@ const markdownComponents: Partial<Components> = {
   h1: ({children}) => (
     <>
       <h1 className="text-3xl md:text-4xl font-bold">{children}</h1>
-      <div className="w-full h-1 bg-theme-300 my-2"></div>
+      <div className="w-full h-0.5 bg-theme-300 my-2"></div>
     </>
   ),
   h2: ({children}) => (
     <>
       <h2 className="text-2xl md:text-3xl font-bold pt-6">{children}</h2>
-      <div className="w-full h-1 bg-theme-300 my-2"></div>
+      <div className="w-full h-0.5 bg-theme-300 my-2"></div>
     </>
   ),
   h3: ({children}) => (
