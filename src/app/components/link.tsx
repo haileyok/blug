@@ -8,7 +8,7 @@ export function Link({
   children: React.ReactNode
 }) {
   return (
-    <a className="text-theme-500 underline" href={href}>
+    <a className="text-500 underline" href={href}>
       {children}
     </a>
   )

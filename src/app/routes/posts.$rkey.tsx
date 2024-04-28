@@ -123,10 +123,12 @@ const markdownComponents: Partial<Components> = {
     </blockquote>
   ),
   code: ({children}) => (
-    <code className="bg-975 px-1 rounded-md">{children}</code>
+    <code className="bg-gray p-1 rounded-md">{children}</code>
   ),
   pre: ({children}) => (
-    <pre className="bg-950 p-2 rounded-md overflow-x-auto my-4">{children}</pre>
+    <pre className="bg-gray p-2 rounded-md overflow-x-auto my-4">
+      {children}
+    </pre>
   ),
   img: ({src, alt}) => (
     <div className="flex justify-center p-6">
