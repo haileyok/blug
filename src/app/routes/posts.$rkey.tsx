@@ -129,7 +129,7 @@ const markdownComponents: Partial<Components> = {
       return <Link href={href as string}>{children}</Link>
     } else {
       return (
-        <>
+        <div className="flex justify-center">
           <blockquote
             className="bluesky-embed"
             data-bluesky-uri={bskyLinkToAtUri(urlp.href)}
@@ -138,7 +138,7 @@ const markdownComponents: Partial<Components> = {
             async
             src="https://embed.bsky.app/static/embed.js"
             charset="utf-8"></script>
-        </>
+        </div>
       )
     }
   },
