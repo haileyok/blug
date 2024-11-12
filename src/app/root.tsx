@@ -30,6 +30,7 @@ export function Layout({children}: {children: React.ReactNode}) {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <Meta />
         <Links />
+        <script async src="https://embed.bsky.app/static/embed.js" />
       </head>
       <body className="flex flex-col h-screen justify-between">
         <div>

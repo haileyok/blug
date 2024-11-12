@@ -5,7 +5,7 @@ import {WhtwndBlogEntryView} from '../../types'
 import {getPost, getProfile} from '../../atproto'
 import {json, LoaderFunctionArgs, MetaFunction} from '@remix-run/node'
 import {Link} from '../components/link'
-import {AppBskyActorDefs} from '@atproto/api'
+import {AppBskyActorDefs, AtUri} from '@atproto/api'
 
 export const loader = async ({params}: LoaderFunctionArgs) => {
   const {rkey} = params
@@ -113,7 +113,29 @@ const markdownComponents: Partial<Components> = {
     <h5 className="text-base md:text-lg font-bold pt-4">{children}</h5>
   ),
   p: ({children}) => <p className="py-2 text-xl text-white">{children}</p>,
-  a: ({children, href}) => <Link href={href as string}>{children}</Link>,
+  a: ({children, href}) => {
+    let urlp
+    try {
+      urlp = new URL(href as string)
+    } catch (e) {
+      // we'll render a link anyway
+    }
+
+    if (
+      !urlp ||
+      urlp.host !== 'bsky.app' ||
+      !urlp.pathname.endsWith('?embed=true')
+    ) {
+      return <Link href={href as string}>{children}</Link>
+    } else {
+      return (
+        <blockquote
+          className="bluesky-embed"
+          data-bluesky-uri="at://did:plc:vjug55kidv6sye7ykr5faxxn/app.bsky.feed.post/3jzn6g7ixgq2y"
+        />
+      )
+    }
+  },
   ul: ({children}) => <ul className="list-disc pl-4">{children}</ul>,
   ol: ({children}) => <ol className="list-decimal pl-4">{children}</ol>,
   li: ({children}) => <li className="py-1">{children}</li>,
@@ -148,4 +170,12 @@ const markdownComponents: Partial<Components> = {
   em: ({children}) => <em className="italic">{children}</em>,
   del: ({children}) => <del>{children}</del>,
   br: () => <br />,
+}
+
+function bskyLinkToAtUri(url: string) {
+  const urlp = new URL(url)
+  const parts = urlp.pathname.split('/')
+  const did = parts[2]
+  const rkey = parts[4]
+  return `at://${did}/app.bsky.feed.post/${rkey}`
 }
