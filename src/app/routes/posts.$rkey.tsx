@@ -124,7 +124,7 @@ const markdownComponents: Partial<Components> = {
     if (
       !urlp ||
       urlp.host !== 'bsky.app' ||
-      !urlp.pathname.endsWith('?embed=true')
+      !urlp.href.endsWith('?embed=true')
     ) {
       return <Link href={href as string}>{children}</Link>
     } else {
