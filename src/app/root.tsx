@@ -49,11 +49,6 @@ export function Layout({children}: {children: React.ReactNode}) {
           </header>
           <main>{children}</main>
         </div>
-        <footer>
-          <p className="text-center text-100 py-4">
-            running on <Link href="https://atproto.com/">atprotocol</Link>
-          </p>
-        </footer>
         <ScrollRestoration />
         <Scripts />
       </body>

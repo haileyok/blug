@@ -4,7 +4,6 @@ import {getPosts, getProfile} from '../../atproto'
 import {useLoaderData} from '@remix-run/react'
 import {WhtwndBlogEntryView} from '../../types'
 import {AppBskyActorDefs} from '@atproto/api'
-import Markdown from 'react-markdown'
 
 export const loader = async () => {
   const posts = await getPosts(undefined)
@@ -25,8 +24,7 @@ export const meta: MetaFunction = () => {
     {title: "Hailey's Cool Site"},
     {
       name: 'description',
-      content:
-        'react native, bluesky, nonsense, and maybe something serious (probably not)',
+      content: 'thoughts and vibes from hailey',
     },
   ]
 }
@@ -52,7 +50,6 @@ export default function Index() {
           )}
           <h1 className="text-5xl md:text-6xl font-bold">It's Hailey! 👋</h1>
         </div>
-        <p className="text-2xl text-300">react native, bluesky, nonsense</p>
       </div>
       <div className="flex flex-col gap-4">
         <h2 className="text-3xl font-bold">blog posts</h2>
@@ -63,7 +60,9 @@ export default function Index() {
                 new Date(b.createdAt).getTime() -
                 new Date(a.createdAt).getTime(),
             )
-            .map(post => <PostItem post={post} key={post.rkey} />)}
+            .map(post => (
+              <PostItem post={post} key={post.rkey} />
+            ))}
         </ul>
       </div>
     </div>
