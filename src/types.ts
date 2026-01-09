@@ -25,14 +25,14 @@ export interface LeafletIframeBlock {
   $type: 'pub.leaflet.blocks.iframe'
 }
 
-type LeafletFacetFeature =
+export type LeafletFacetFeature =
   | {$type: 'pub.leaflet.richtext.facet#bold'}
   | {$type: 'pub.leaflet.richtext.facet#italic'}
   | {$type: 'pub.leaflet.richtext.facet#strikethrough'}
   | {$type: 'pub.leaflet.richtext.facet#code'}
   | {$type: 'pub.leaflet.richtext.facet#link'; uri: string}
 
-type LeafletFacet = {
+export interface LeafletFacet {
   features: LeafletFacetFeature[]
   index: {
     byteStart: number

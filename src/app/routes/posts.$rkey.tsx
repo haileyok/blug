@@ -52,7 +52,6 @@ export const meta: MetaFunction<typeof loader> = ({data}) => {
     },
     {
       name: 'og:description',
-      // TODO:same as above
       content: `${postText.split(' ').slice(0, 100).join(' ')}...`,
     },
     ...(ogImageUrl
@@ -65,6 +64,7 @@ export const meta: MetaFunction<typeof loader> = ({data}) => {
       : []),
   ]
 }
+
 export default function Posts() {
   const {did, post, profile} = useLoaderData<{
     did: string
@@ -79,8 +79,10 @@ export default function Posts() {
   return (
     <div className="container mx-auto pt-10 md:pt-20 pb-20">
       <div className="flex flex-col text-center gap-4">
-        <h1 className="text-5xl md:text-6xl font-bold">{post.title}</h1>
-        <span className="text-md italic text-300">
+        <h1 className="text-5xl md:text-6xl font-bold text-950">
+          {post.title}
+        </h1>
+        <span className="text-md italic text-400">
           Poorly written by {profile.displayName} on{' '}
           {new Date(post.publishedAt).toLocaleDateString(undefined, {
             year: 'numeric',
@@ -133,38 +135,42 @@ function Header({block}: {block: LeafletHeaderBlock}) {
     case 1:
       return (
         <div>
-          <h1 className="text-3xl md:text-4xl font-bold">{block.plaintext}</h1>
-          <div className="w-full h-0.5 bg-300 my-2 "></div>
+          <h1 className="text-3xl md:text-4xl font-bold text-950">
+            {block.plaintext}
+          </h1>
+          <div className="w-full h-0.5 bg-200 my-2"></div>
         </div>
       )
     case 2:
       return (
         <div>
-          <h2 className="text-2xl md:text-3xl font-bold pt-6">
+          <h2 className="text-2xl md:text-3xl font-bold text-950 pt-6">
             {block.plaintext}
           </h2>
-          <div className="w-full h-0.5 bg-300 my-2"></div>
+          <div className="w-full h-0.5 bg-200 my-2"></div>
         </div>
       )
     case 3:
       return (
-        <h3 className="text-xl md:text-2xl font-bold pt-4">
+        <h3 className="text-xl md:text-2xl font-bold text-900 pt-4">
           {block.plaintext}
         </h3>
       )
     case 4:
       return (
-        <h4 className="text-lg md:text-xl font-bold pt-4">{block.plaintext}</h4>
+        <h4 className="text-lg md:text-xl font-bold text-900 pt-4">
+          {block.plaintext}
+        </h4>
       )
     case 5:
       return (
-        <h5 className="text-base md:text-lg font-bold pt-4">
+        <h5 className="text-base md:text-lg font-bold text-900 pt-4">
           {block.plaintext}
         </h5>
       )
     case 6:
       return (
-        <h6 className="text-base md:text-lg font-bold pt-4">
+        <h6 className="text-base md:text-lg font-bold text-900 pt-4">
           {block.plaintext}
         </h6>
       )
@@ -189,7 +195,7 @@ function Text({
         ? 'text-md'
         : 'text-2xl'
 
-  const className = `${sizeClass} text-white`
+  const className = `${sizeClass} text-900 leading-relaxed`
 
   return <p className={className}>{renderRichText(plaintext, facets)}</p>
 }
@@ -237,13 +243,20 @@ function renderRichText(
           break
         case 'pub.leaflet.richtext.facet#link':
           element = (
-            <Link key={`link-${i}`} href={feature.uri}>
+            <Link
+              key={`link-${i}`}
+              href={feature.uri}
+              className="text-600 hover:text-700 underline underline-offset-2">
               {element}
             </Link>
           )
           break
         case 'pub.leaflet.richtext.facet#code':
-          element = <code className="bg-gray p-1 rounded-md">{element}</code>
+          element = (
+            <code className="bg-100 text-600 px-1.5 py-0.5 rounded-md text-[0.9em] font-mono border border-200">
+              {element}
+            </code>
+          )
       }
     }
 
@@ -257,9 +270,10 @@ function renderRichText(
 
   return segments
 }
+
 function BlockQuote({block}: {block: LeafletBlockquoteBlock}) {
   return (
-    <blockquote className="border-l-4 border-300 py-2 pl-4">
+    <blockquote className="border-l-4 border-600 bg-50 py-3 pl-4 pr-4 rounded-r-md">
       <Text plaintext={block.plaintext} />
     </blockquote>
   )
@@ -267,24 +281,26 @@ function BlockQuote({block}: {block: LeafletBlockquoteBlock}) {
 
 function Code({block}: {block: LeafletCodeBlock}) {
   return (
-    <pre className="bg-gray py-4 px-4 rounded-md overflow-x-auto my-4">
+    <pre className="bg-100 text-900 py-4 px-4 rounded-lg overflow-x-auto my-4 font-mono text-sm leading-relaxed border border-200">
       {block.plaintext}
     </pre>
   )
-
-  // return <code className="bg-gray p-1 rounded-md">{block.plaintext}</code>
 }
 
 function HorizontalRule() {
-  return <hr className="my-4" />
+  return <hr className="my-6 border-200" />
 }
 
 function Image({block, did}: {block: LeafletImageBlock; did: string}) {
   const cdnUrl = `https://cdn.bsky.app/img/feed_fullsize/plain/${did}/${block.image.ref.$link}@jpeg`
 
   return (
-    <div className="flex justify-center">
-      <img src={cdnUrl} alt={block.alt} className="rounded-md" />
+    <div className="flex justify-center my-4">
+      <img
+        src={cdnUrl}
+        alt={block.alt}
+        className="rounded-lg shadow-md max-w-full"
+      />
     </div>
   )
 }
@@ -297,16 +313,25 @@ function Website({block, did}: {block: LeafletWebsiteBlock; did: string}) {
 
     const cdnUrl = `https://cdn.bsky.app/img/feed_thumbnail/plain/${did}/${block.previewImage.ref.$link}@jpeg`
 
-    return <img src={cdnUrl} className="rounded-lg h-40" />
+    return (
+      <img
+        src={cdnUrl}
+        className="rounded-lg h-40 object-cover flex-shrink-0"
+      />
+    )
   }
 
   return (
-    <a href={block.src} className="border-1 rounded-lg flex gap-4 p-4">
-      <div>
-        <h3 className="text-xl md:text-2xl font-bold">
+    <a
+      href={block.src}
+      className="border-1 border-200 rounded-lg flex gap-4 p-4 bg-50 hover:bg-100 hover:border-300 transition-colors">
+      <div className="flex-1 min-w-0">
+        <h3 className="text-xl md:text-2xl font-bold text-900 truncate">
           {block.title || block.src}
         </h3>
-        {block.description ? <p>{block.description}</p> : null}
+        {block.description ? (
+          <p className="text-500 mt-1 line-clamp-2">{block.description}</p>
+        ) : null}
       </div>
       <PreviewImage />
     </a>
@@ -345,20 +370,20 @@ function BskyPost({block}: {block: LeafletBskyPostBlock}) {
     }
   }, [block.postRef.uri])
 
-  return <div ref={containerRef} className="flex justify-center" />
+  return <div ref={containerRef} className="flex justify-center my-4" />
 }
 
 function Error() {
   return (
     <div className="container mx-auto pt-10 md:pt-20 pb-20">
-      <h1 className="text-5xl md:text-6xl font-bold text-center">
+      <h1 className="text-5xl md:text-6xl font-bold text-center text-950">
         Uh...something went wrong.
       </h1>
       <div className="p-10">
         <img
           src="/monkey.jpg"
           alt="Monkey muppet meme image"
-          className="rounded-md"
+          className="rounded-lg shadow-md"
         />
       </div>
     </div>
@@ -366,30 +391,39 @@ function Error() {
 }
 
 const markdownComponents: Partial<Components> = {
-  // TODO: same
-  ul: ({children}) => <ul className="list-disc pl-4">{children}</ul>,
-  // TODO: same
-  ol: ({children}) => <ol className="list-decimal pl-4">{children}</ol>,
-  // TODO: same
+  ul: ({children}) => <ul className="list-disc pl-4 text-900">{children}</ul>,
+  ol: ({children}) => (
+    <ol className="list-decimal pl-4 text-900">{children}</ol>
+  ),
   li: ({children}) => <li className="py-1">{children}</li>,
   pre: ({children}) => (
-    <pre className="bg-gray p-2 rounded-md overflow-x-auto my-4">
+    <pre className="bg-100 text-900 p-4 rounded-lg overflow-x-auto my-4 font-mono text-sm border border-200">
       {children}
     </pre>
   ),
   img: ({src, alt}) => (
     <div className="flex justify-center p-6">
-      <img src={src as string} alt={alt as string} className="rounded-md" />
+      <img
+        src={src as string}
+        alt={alt as string}
+        className="rounded-lg shadow-md"
+      />
     </div>
   ),
   table: ({children}) => (
-    <table className="table-auto w-full">{children}</table>
+    <table className="table-auto w-full border-collapse">{children}</table>
   ),
   thead: ({children}) => <thead className="bg-100">{children}</thead>,
-  tbody: ({children}) => <tbody>{children}</tbody>,
-  tr: ({children}) => <tr>{children}</tr>,
-  th: ({children}) => <th className="border border-300 p-2">{children}</th>,
-  td: ({children}) => <td className="border border-300 p-2">{children}</td>,
+  tbody: ({children}) => <tbody className="bg-50">{children}</tbody>,
+  tr: ({children}) => <tr className="border-b border-200">{children}</tr>,
+  th: ({children}) => (
+    <th className="border border-200 p-3 text-left font-semibold text-900">
+      {children}
+    </th>
+  ),
+  td: ({children}) => (
+    <td className="border border-200 p-3 text-900">{children}</td>
+  ),
 }
 
 function bskyLinkToAtUri(url: string) {

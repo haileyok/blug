@@ -9,7 +9,6 @@ import {
   useRouteError,
 } from '@remix-run/react'
 import {json, LinksFunction} from '@remix-run/node'
-
 import styles from './tailwind.css?url'
 import {getProfile} from 'src/atproto'
 import {AppBskyActorDefs} from '@atproto/api'
@@ -47,26 +46,28 @@ export function Layout({children}: {children: React.ReactNode}) {
         <Links />
         <script async src="https://embed.bsky.app/static/embed.js" />
       </head>
-      <body className="flex flex-col h-screen justify-between">
+      <body className="flex flex-col h-screen justify-between bg-0 text-900 antialiased">
         <div>
           <header className="flex justify-between mx-auto max-w-7xl pt-4 px-4">
             <div className="flex gap-2">
               {profile ? (
-                <img
-                  className="rounded-full w-14 h-14"
-                  src={profile.avatar}
-                  alt="Hailey's avatar"
-                />
+                <a href="/">
+                  <img
+                    className="rounded-full w-14 h-14"
+                    src={profile.avatar}
+                    alt="Hailey's avatar"
+                  />
+                </a>
               ) : (
-                <div className="w-32 h-32 bg-gray-300 rounded-full"></div>
+                <div className="w-14 h-14 bg-100 rounded-full"></div>
               )}
-              <NavLink href="/" selected={false}>
-                Hailey
-              </NavLink>
             </div>
-            <div className="flex gap-2">
-              <NavLink href="/blog" selected={false}>
+            <nav className="flex gap-2">
+              <NavLink href="/" selected={false}>
                 Blog
+              </NavLink>
+              <NavLink href="/about" selected={false}>
+                About
               </NavLink>
               <NavLink
                 href="https://bsky.app/profile/haileyok.com"
@@ -76,7 +77,7 @@ export function Layout({children}: {children: React.ReactNode}) {
               <NavLink href="https://github.com/haileyok" selected={false}>
                 GitHub
               </NavLink>
-            </div>
+            </nav>
           </header>
           <main>{children}</main>
         </div>
@@ -100,13 +101,13 @@ function NavLink({
   selected: boolean
   children: string
 }) {
-  const topClassName = selected ? 'h-1 bg-50' : 'h-1'
-  const className = selected ? 'text-50' : 'text-300'
+  const topClassName = selected ? 'h-1 bg-600' : 'h-1'
+  const textClassName = selected ? 'text-600' : 'text-500 hover:text-950'
 
   return (
-    <a href={href} className="hover:underline">
+    <a href={href} className="transition-colors">
       <div className={topClassName} />
-      <p className={`p-3 ${className}`}>{children}</p>
+      <p className={`p-3 ${textClassName}`}>{children}</p>
     </a>
   )
 }
@@ -114,18 +115,30 @@ function NavLink({
 export function ErrorBoundary() {
   const error = useRouteError()
   console.error(error)
+
   return (
-    <div className="container mZx-auto pt-10 md:pt-20 pb-20">
-      <h1 className="text-5xl md:text-6xl font-bold text-center">
-        Uh...something went wrong.
-      </h1>
-      <div className="p-10">
-        <img
-          src="/monkey.jpg"
-          alt="Monkey muppet meme image"
-          className="rounded-md"
-        />
-      </div>
-    </div>
+    <html lang="en">
+      <head>
+        <meta charSet="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <Meta />
+        <Links />
+      </head>
+      <body className="bg-0 text-900 antialiased">
+        <div className="container mx-auto pt-10 md:pt-20 pb-20">
+          <h1 className="text-5xl md:text-6xl font-bold text-center text-950">
+            Uh...something went wrong.
+          </h1>
+          <div className="p-10 flex justify-center">
+            <img
+              src="/monkey.jpg"
+              alt="Monkey muppet meme image"
+              className="rounded-lg shadow-md"
+            />
+          </div>
+        </div>
+        <Scripts />
+      </body>
+    </html>
   )
 }
