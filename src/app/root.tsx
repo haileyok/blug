@@ -51,11 +51,13 @@ export function Layout({children}: {children: React.ReactNode}) {
           <header className="flex justify-between mx-auto max-w-7xl pt-4 px-4">
             <div className="flex gap-2">
               {profile ? (
-                <img
-                  className="rounded-full w-14 h-14"
-                  src={profile.avatar}
-                  alt="Hailey's avatar"
-                />
+                <a href="/">
+                  <img
+                    className="rounded-full w-14 h-14"
+                    src={profile.avatar}
+                    alt="Hailey's avatar"
+                  />
+                </a>
               ) : (
                 <div className="w-14 h-14 bg-100 rounded-full"></div>
               )}
@@ -63,6 +65,9 @@ export function Layout({children}: {children: React.ReactNode}) {
             <nav className="flex gap-2">
               <NavLink href="/" selected={false}>
                 Blog
+              </NavLink>
+              <NavLink href="/about" selected={false}>
+                About
               </NavLink>
               <NavLink
                 href="https://bsky.app/profile/haileyok.com"
