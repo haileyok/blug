@@ -32,7 +32,7 @@ export default function About() {
           <WorkItem
             company="Bluesky"
             href="https://bsky.social"
-            role="Safety, React Native"
+            role="Safety, Product (React Native)"
             period="Jan 2024 – Dec 2025"
           />
         </ul>
