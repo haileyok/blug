@@ -1,30 +1,28 @@
 # Blug - An ATProtocol Blog
 
-A simple little blog that pulls posts from your PDS, using the `com.whtwnd.blog.entry` lexicon. Uses Redis to keep them
+A simple little blog that pulls posts from your PDS, using the `pub.leaflet.document` lexicon. Uses Redis to keep them
 cached for a bit, in case you're popular and don't want to be constantly polling your PDS.
 
-```ts
-interface WhtwndBlogEntryRecord {
-  $type: 'com.whtwnd.blog.entry'
-  content?: string
-  createdAt: string
-  theme?: string
-  title: string
-  ogp?: {
-    height: number | null
-    url: string | null
-    width: number | null
-  }
-}
+## Leaflet Support
 
-interface WhtwndBlogEntryView {
-  rkey: string
-  cid: string
-  title: string
-  content?: string
-  createdAt: string
-  banner?: string
-}
+This blog now uses [Leaflet](https://leaflet.pub), a block-based document format for ATProtocol. Instead of simple markdown content, posts are composed of structured blocks that support rich formatting and embedded content.
+
+### Supported Block Types
+
+- **Text blocks** with rich text formatting (bold, italic, strikethrough, code, links)
+- **Header blocks** (levels 1-6) with automatic styling
+- **Image blocks** with aspect ratios and alt text
+- **Blockquote blocks** for quoted content
+- **Code blocks** for syntax highlighting
+- **Website cards** with preview images and metadata
+- **Embedded Bluesky posts** using the official embed widget
+- **Horizontal rules** for visual separation
+
+### Image Handling
+
+Images are served via Bluesky's CDN with proper URLs constructed from the DID and blob reference:
+```
+https://cdn.bsky.app/img/feed_fullsize/plain/{did}/{blobRef}@jpeg
 ```
 
 ## Configuration
@@ -82,8 +80,3 @@ Then build and serve.
 yarn build
 yarn start
 ```
-
-## Creating Posts
-
-There's various ways you could do this. I just use a Markdown editor and then manually save them with `createRecord`.
-You can also use the editor at [whtwnd's website](https://whtwnd.com/edit) to create them.
