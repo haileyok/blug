@@ -1,7 +1,6 @@
-import {atpAgent} from './agent.js'
-import {whtwndBlogEntryRecordToView} from './dataToView'
-import {WhtwndBlogEntryRecord, WhtwndBlogEntryView} from '../types'
-import {getCachedPosts, setCachedPost, setCachedPosts} from '../redis/redis.js'
+import {ATP_AGENT} from './agent.js'
+import {getCachedPosts, setCachedPosts} from '../redis/redis.js'
+import {LeafletDocument} from 'src/types.js'
 
 export const getPosts = async (
   cursor: string | undefined,
@@ -13,8 +12,8 @@ export const getPosts = async (
   }
 
   const repo = process.env.ATP_IDENTIFIER!
-  const res = await atpAgent.com.atproto.repo.listRecords({
-    collection: 'com.whtwnd.blog.entry',
+  const res = await ATP_AGENT.com.atproto.repo.listRecords({
+    collection: 'pub.leaflet.document',
     repo,
     cursor,
   })
@@ -23,19 +22,14 @@ export const getPosts = async (
     throw new Error('Failed to get posts.')
   }
 
-  const posts = res.data.records.map(data =>
-    whtwndBlogEntryRecordToView({
-      uri: data.uri,
-      cid: data.cid?.toString() ?? '',
-      value: data.value as WhtwndBlogEntryRecord,
-    }),
-  ) as WhtwndBlogEntryView[]
-
-  // Cache them individually too for good measure, why not {
-  for (const post of posts) {
-    setCachedPost(post)
-  }
+  const posts = res.data.records.map(data => {
+    const post = data.value as LeafletDocument
+    const uriPts = data.uri.split('/')
+    post.rkey = uriPts[uriPts.length - 1]
+    return post
+  })
 
   await setCachedPosts(posts)
+
   return posts
 }

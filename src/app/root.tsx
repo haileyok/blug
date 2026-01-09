@@ -5,12 +5,14 @@ import {
   Outlet,
   Scripts,
   ScrollRestoration,
+  useLoaderData,
   useRouteError,
 } from '@remix-run/react'
-import {LinksFunction} from '@remix-run/node'
+import {json, LinksFunction} from '@remix-run/node'
 
 import styles from './tailwind.css?url'
-import {Link} from './components/link'
+import {getProfile} from 'src/atproto'
+import {AppBskyActorDefs} from '@atproto/api'
 
 export const links: LinksFunction = () => [
   {rel: 'stylesheet', href: styles},
@@ -22,7 +24,16 @@ export const links: LinksFunction = () => [
   },
 ]
 
+export const loader = async () => {
+  const profile = await getProfile()
+  return json({profile})
+}
+
 export function Layout({children}: {children: React.ReactNode}) {
+  const {profile} = useLoaderData<{
+    profile: AppBskyActorDefs.ProfileViewDetailed
+  }>()
+
   return (
     <html lang="en">
       <head>
@@ -34,18 +45,34 @@ export function Layout({children}: {children: React.ReactNode}) {
       </head>
       <body className="flex flex-col h-screen justify-between">
         <div>
-          <header className="flex justify-center gap-4 pb-4">
-            <NavLink href="/" selected={false}>
-              Home
-            </NavLink>
-            <NavLink
-              href="https://bsky.app/profile/haileyok.com"
-              selected={false}>
-              Bluesky
-            </NavLink>
-            <NavLink href="https://github.com/haileyok" selected={false}>
-              GitHub
-            </NavLink>
+          <header className="flex justify-between mx-auto max-w-7xl pt-4 px-4">
+            <div className="flex gap-2">
+              {profile ? (
+                <img
+                  className="rounded-full w-14 h-14"
+                  src={profile.avatar}
+                  alt="Hailey's avatar"
+                />
+              ) : (
+                <div className="w-32 h-32 bg-gray-300 rounded-full"></div>
+              )}
+              <NavLink href="/" selected={false}>
+                Hailey
+              </NavLink>
+            </div>
+            <div className="flex gap-2">
+              <NavLink href="/blog" selected={false}>
+                Blog
+              </NavLink>
+              <NavLink
+                href="https://bsky.app/profile/haileyok.com"
+                selected={false}>
+                Bluesky
+              </NavLink>
+              <NavLink href="https://github.com/haileyok" selected={false}>
+                GitHub
+              </NavLink>
+            </div>
           </header>
           <main>{children}</main>
         </div>
@@ -73,7 +100,7 @@ function NavLink({
   const className = selected ? 'text-50' : 'text-300'
 
   return (
-    <a href={href}>
+    <a href={href} className="hover:underline">
       <div className={topClassName} />
       <p className={`p-3 ${className}`}>{children}</p>
     </a>

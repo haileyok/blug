@@ -1,4 +1,4 @@
-import {bskyAgent} from './agent.js'
+import {BSKY_AGENT} from './agent.js'
 import {getCachedProfile, setCachedProfile} from '../redis/redis.js'
 
 export const getProfile = async () => {
@@ -9,7 +9,7 @@ export const getProfile = async () => {
     return cachedProfile
   }
 
-  const res = await bskyAgent.getProfile({
+  const res = await BSKY_AGENT.getProfile({
     actor: did,
   })
 

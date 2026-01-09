@@ -1,11 +1,10 @@
-import React from 'react'
 import {useLoaderData} from '@remix-run/react'
 import Markdown, {Components} from 'react-markdown'
-import {WhtwndBlogEntryView} from '../../types'
 import {getPost, getProfile} from '../../atproto'
 import {json, LoaderFunctionArgs, MetaFunction} from '@remix-run/node'
 import {Link} from '../components/link'
 import {AppBskyActorDefs, AtUri} from '@atproto/api'
+import {LeafletDocument} from 'src/types'
 
 export const loader = async ({params}: LoaderFunctionArgs) => {
   const {rkey} = params
@@ -19,7 +18,8 @@ export const meta: MetaFunction<typeof loader> = ({data}) => {
     {title: `${data?.post.title} | Hailey's Cool Site`},
     {
       name: 'description',
-      content: `${data?.post.content?.split(' ').slice(0, 100).join(' ')}...`,
+      // TODO: I think we actually want to be parsing out the text blocks here and slicing
+      content: `${data?.post.description?.split(' ').slice(0, 100).join(' ')}...`,
     },
     {
       name: 'og:title',
@@ -27,7 +27,8 @@ export const meta: MetaFunction<typeof loader> = ({data}) => {
     },
     {
       name: 'og:description',
-      content: `${data?.post.content?.split(' ').slice(0, 100).join(' ')}...`,
+      // TODO:same as above
+      content: `${data?.post.description?.split(' ').slice(0, 100).join(' ')}...`,
     },
     ...(data?.post.banner && data?.post.banner !== ''
       ? [
@@ -41,7 +42,7 @@ export const meta: MetaFunction<typeof loader> = ({data}) => {
 }
 export default function Posts() {
   const {post, profile} = useLoaderData<{
-    post: WhtwndBlogEntryView
+    post: LeafletDocument
     profile: AppBskyActorDefs.ProfileViewDetailed
   }>()
 
@@ -55,7 +56,7 @@ export default function Posts() {
         <h1 className="text-5xl md:text-6xl font-bold">{post.title}</h1>
         <span className="text-md italic text-300">
           Poorly written by {profile.displayName} on{' '}
-          {new Date(post.createdAt).toLocaleDateString(undefined, {
+          {new Date(post.publishedAt).toLocaleDateString(undefined, {
             year: 'numeric',
             month: 'long',
             day: 'numeric',
@@ -65,9 +66,9 @@ export default function Posts() {
 
       <div className="py-4" />
       <div>
-        <Markdown components={markdownComponents} className="break-words">
-          {post.content}
-        </Markdown>
+        <Markdown
+          components={markdownComponents}
+          className="break-words"></Markdown>
       </div>
     </div>
   )
@@ -137,7 +138,7 @@ const markdownComponents: Partial<Components> = {
           <script
             async
             src="https://embed.bsky.app/static/embed.js"
-            charset="utf-8"></script>
+            charSet="utf-8"></script>
         </div>
       )
     }
