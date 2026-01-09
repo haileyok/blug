@@ -60,12 +60,9 @@ export function Layout({children}: {children: React.ReactNode}) {
               ) : (
                 <div className="w-32 h-32 bg-gray-300 rounded-full"></div>
               )}
-              <NavLink href="/" selected={false}>
-                Hailey
-              </NavLink>
             </div>
             <div className="flex gap-2">
-              <NavLink href="/blog" selected={false}>
+              <NavLink href="/" selected={false}>
                 Blog
               </NavLink>
               <NavLink

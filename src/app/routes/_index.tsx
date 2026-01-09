@@ -36,7 +36,7 @@ export default function Index() {
     <div className="container flex flex-col mx-auto pt-10 md:pt-20 pb-20 gap-10">
       <div className="flex-col text-center">
         <div className="flex flex-col md:flex-row justify-center items-center gap-4 md:gap-20 pb-4 md:pb-8">
-          <h1 className="text-5xl md:text-6xl font-bold">It's Hailey! 👋</h1>
+          <h1 className="text-5xl md:text-5xl font-bold">It's Hailey! 👋</h1>
         </div>
       </div>
       <div className="flex flex-col gap-4">
