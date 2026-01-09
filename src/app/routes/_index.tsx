@@ -37,7 +37,7 @@ export default function Index() {
 
       <p className="text-xl">
         Software engineer, previously at Bluesky. These days I'm mostly
-        interested in online safety tooling, ATProtocol, and other social media
+        interested in online safety tooling, AT Protocol, and other social media
         stuff. Sometimes I write about it here.
       </p>
 
