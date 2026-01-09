@@ -1,3 +1,17 @@
+export interface Blob {
+  $type: 'blob'
+  ref: {
+    $link: string
+  }
+  mimeType: string
+  size: number
+}
+
+export interface AspectRatio {
+  width: number
+  height: number
+}
+
 export interface BskyProfileView {
   did: string
   handle: string
@@ -11,7 +25,20 @@ export interface LeafletIframeBlock {
   $type: 'pub.leaflet.blocks.iframe'
 }
 
-export interface LeafletFacet {}
+type LeafletFacetFeature =
+  | {$type: 'pub.leaflet.richtext.facet#bold'}
+  | {$type: 'pub.leaflet.richtext.facet#italic'}
+  | {$type: 'pub.leaflet.richtext.facet#strikethrough'}
+  | {$type: 'pub.leaflet.richtext.facet#code'}
+  | {$type: 'pub.leaflet.richtext.facet#link'; uri: string}
+
+type LeafletFacet = {
+  features: LeafletFacetFeature[]
+  index: {
+    byteStart: number
+    byteEnd: number
+  }
+}
 
 export interface LeafletTextBlock {
   $type: 'pub.leaflet.blocks.text'
@@ -36,11 +63,8 @@ export interface LeafletHeaderBlock {
 export interface LeafletImageBlock {
   $type: 'pub.leaflet.blocks.image'
   alt?: string
-  image: any // blob
-  aspectRatio: {
-    width: number
-    height: number
-  }
+  image: Blob
+  aspectRatio: AspectRatio
 }
 
 export interface LeafletUnorderedListBlock {
@@ -55,7 +79,7 @@ export interface LeafletWebsiteBlock {
   src: string
   title?: string
   description?: string
-  previewImage?: any // blob
+  previewImage?: Blob
 }
 
 export interface LeafletMathBlock {
@@ -100,21 +124,24 @@ export interface LeafletButtonBlock {
   text: string
 }
 
-export type LeafletBlock =
-  | LeafletIframeBlock
-  | LeafletTextBlock
-  | LeafletBlockquoteBlock
-  | LeafletHeaderBlock
-  | LeafletImageBlock
-  | LeafletUnorderedListBlock
-  | LeafletWebsiteBlock
-  | LeafletMathBlock
-  | LeafletCodeBlock
-  | LeafletHorizontalRuleBlock
-  | LeafletBskyPostBlock
-  | LeafletPageBlock
-  | LeafletPollBlock
-  | LeafletButtonBlock
+export interface LeafletBlock {
+  $type: 'pub.leaflet.pages.linearDocument#block'
+  block:
+    | LeafletIframeBlock
+    | LeafletTextBlock
+    | LeafletBlockquoteBlock
+    | LeafletHeaderBlock
+    | LeafletImageBlock
+    | LeafletUnorderedListBlock
+    | LeafletWebsiteBlock
+    | LeafletMathBlock
+    | LeafletCodeBlock
+    | LeafletHorizontalRuleBlock
+    | LeafletBskyPostBlock
+    | LeafletPageBlock
+    | LeafletPollBlock
+    | LeafletButtonBlock
+}
 
 export interface LeafletLinearDocument {
   id?: string
@@ -126,10 +153,11 @@ export interface LeafletCanvas {}
 export interface LeafletDocument {
   $type: 'pub.leaflet.document'
   author: string
+  coverImage?: Blob
   description: string
   publishedAt: string // datetime
   tags?: string[]
-  pages: (LeafletLinearDocument | LeafletCanvas)[]
+  pages: LeafletLinearDocument[] // TODO: this should support canvas but idk what that is yet
   theme?: string
   title: any // ignoring for now but included here, pub.leaflet.publication#theme
   publication?: string // aturi

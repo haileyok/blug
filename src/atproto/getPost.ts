@@ -8,7 +8,7 @@ export const getPost = async (rkey: string, skipCache?: boolean) => {
     return cachedRes
   }
 
-  const repo = process.env.ATP_IDENTIFIER!
+  const repo = process.env.ATP_DID!
 
   const res = await ATP_AGENT.com.atproto.repo.getRecord({
     collection: 'pub.leaflet.document',

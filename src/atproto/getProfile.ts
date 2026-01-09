@@ -18,5 +18,6 @@ export const getProfile = async () => {
   }
 
   await setCachedProfile(res.data)
+
   return res.data
 }
