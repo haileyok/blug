@@ -18,13 +18,11 @@ export default function About() {
         <h1 className="text-5xl md:text-6xl font-bold text-950">About</h1>
       </div>
 
-      <div className="flex flex-col gap-4 text-xl text-900 leading-relaxed">
-        <p>
-          Software engineer, previously at Bluesky. These days I'm mostly
-          interested in online safety tooling, AT Protocol, and other social
-          media stuff. Sometimes I write about it here.
-        </p>
-      </div>
+      <p className="text-xl">
+        Software engineer, previously at Bluesky. These days I'm mostly
+        interested in online safety tooling, AT Protocol, and other social media
+        stuff. Sometimes I write about it here.
+      </p>
 
       <div className="flex flex-col gap-4">
         <h2 className="text-2xl font-bold text-950">Work</h2>
