@@ -1,7 +1,6 @@
-import {atpAgent} from './agent.js'
-import {WhtwndBlogEntryRecord, WhtwndBlogEntryView} from '../types'
-import {whtwndBlogEntryRecordToView} from './dataToView'
+import {ATP_AGENT} from './agent.js'
 import {getCachedPost, setCachedPost} from '../redis/redis'
+import {LeafletDocument} from 'src/types.js'
 
 export const getPost = async (rkey: string, skipCache?: boolean) => {
   const cachedRes = await getCachedPost(rkey)
@@ -9,10 +8,10 @@ export const getPost = async (rkey: string, skipCache?: boolean) => {
     return cachedRes
   }
 
-  const repo = process.env.ATP_IDENTIFIER!
+  const repo = process.env.ATP_DID!
 
-  const res = await atpAgent.com.atproto.repo.getRecord({
-    collection: 'com.whtwnd.blog.entry',
+  const res = await ATP_AGENT.com.atproto.repo.getRecord({
+    collection: 'pub.leaflet.document',
     repo,
     rkey,
   })
@@ -21,12 +20,12 @@ export const getPost = async (rkey: string, skipCache?: boolean) => {
     throw new Error('Failed to get post.')
   }
 
-  const post = whtwndBlogEntryRecordToView({
-    uri: res.data.uri,
-    cid: res.data.cid?.toString() ?? '',
-    value: res.data.value as WhtwndBlogEntryRecord,
-  }) as WhtwndBlogEntryView
+  const post = res.data.value as LeafletDocument
 
-  await setCachedPost(post)
+  await setCachedPost(rkey, post)
+
+  // set the rkey in the post
+  post.rkey = rkey
+
   return post
 }

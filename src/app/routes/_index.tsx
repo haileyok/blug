@@ -1,18 +1,15 @@
-import React from 'react'
 import {json, MetaFunction} from '@remix-run/node'
 import {getPosts, getProfile} from '../../atproto'
 import {useLoaderData} from '@remix-run/react'
-import {WhtwndBlogEntryView} from '../../types'
 import {AppBskyActorDefs} from '@atproto/api'
+import {LeafletDocument} from 'src/types'
 
 export const loader = async () => {
   const posts = await getPosts(undefined)
   const profile = await getProfile()
 
-  const postsFiltered = posts.filter(p => !p.content?.startsWith('NOT_LIVE'))
-
-  const postsShortened = postsFiltered.map(p => {
-    p.content = p.content?.slice(0, 300)
+  const postsShortened = posts.map(p => {
+    p.description = p.description?.slice(0, 300)
     return p
   })
 
@@ -31,7 +28,7 @@ export const meta: MetaFunction = () => {
 
 export default function Index() {
   const {posts, profile} = useLoaderData<{
-    posts: WhtwndBlogEntryView[]
+    posts: LeafletDocument[]
     profile: AppBskyActorDefs.ProfileViewDetailed
   }>()
 
@@ -39,15 +36,6 @@ export default function Index() {
     <div className="container flex flex-col mx-auto pt-10 md:pt-20 pb-20 gap-10">
       <div className="flex-col text-center">
         <div className="flex flex-col md:flex-row justify-center items-center gap-4 md:gap-20 pb-4 md:pb-8">
-          {profile ? (
-            <img
-              className="rounded-full w-32 h-32"
-              src={profile.avatar}
-              alt="Hailey's avatar"
-            />
-          ) : (
-            <div className="w-32 h-32 bg-gray-300 rounded-full"></div>
-          )}
           <h1 className="text-5xl md:text-6xl font-bold">It's Hailey! 👋</h1>
         </div>
       </div>
@@ -57,24 +45,23 @@ export default function Index() {
           {posts
             ?.sort(
               (a, b) =>
-                new Date(b.createdAt).getTime() -
-                new Date(a.createdAt).getTime(),
+                new Date(b.publishedAt).getTime() -
+                new Date(a.publishedAt).getTime(),
             )
-            .map(post => (
-              <PostItem post={post} key={post.rkey} />
-            ))}
+            // @ts-ignore - TODO: i think remix does something with jsonify? ugh i hate typescript lol
+            .map(post => <PostItem post={post} key={post.rkey} />)}
         </ul>
       </div>
     </div>
   )
 }
 
-function PostItem({post}: {post: WhtwndBlogEntryView}) {
+function PostItem({post}: {post: LeafletDocument}) {
   return (
     <li>
       <div className="flex">
         <p>
-          {new Date(post.createdAt).toLocaleDateString('en-US', {
+          {new Date(post.publishedAt).toLocaleDateString('en-US', {
             year: '2-digit',
             month: '2-digit',
             day: '2-digit',
