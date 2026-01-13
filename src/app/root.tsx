@@ -48,8 +48,8 @@ export function Layout({children}: {children: React.ReactNode}) {
       </head>
       <body className="flex flex-col h-screen justify-between bg-0 text-900 antialiased">
         <div>
-          <header className="flex justify-between mx-auto max-w-7xl pt-4 px-4">
-            <div className="flex gap-2">
+          <header className="flex justify-between gap-1 mx-auto max-w-7xl pt-4 px-4">
+            <div className="flex shrink-0 gap-2">
               {profile ? (
                 <a href="/">
                   <img
@@ -62,7 +62,7 @@ export function Layout({children}: {children: React.ReactNode}) {
                 <div className="w-14 h-14 bg-100 rounded-full"></div>
               )}
             </div>
-            <nav className="flex gap-2">
+            <nav className="flex sm:gap-2">
               <NavLink href="/" selected={false}>
                 Blog
               </NavLink>
