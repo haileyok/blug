@@ -13,7 +13,7 @@ export const getPosts = async (
 
   const repo = process.env.ATP_IDENTIFIER!
   const res = await ATP_AGENT.com.atproto.repo.listRecords({
-    collection: 'pub.leaflet.document',
+    collection: 'site.standard.document',
     repo,
     cursor,
   })

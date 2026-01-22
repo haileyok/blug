@@ -28,7 +28,7 @@ export const meta: MetaFunction<typeof loader> = ({data}) => {
   let postText = ''
   let ogImageUrl
   if (data) {
-    for (const block of data.post.pages[0].blocks) {
+    for (const block of data.post.content.pages[0].blocks) {
       if (block.block.$type === 'pub.leaflet.blocks.text') {
         postText += `\n${block.block.plaintext}`
       } else if (
@@ -93,7 +93,7 @@ export default function Posts() {
       </div>
 
       <div className="py-4">
-        {post.pages.map((page, idx) => (
+        {post.content.pages.map((page, idx) => (
           <div className="flex flex-col gap-4" key={idx}>
             {page.blocks.map((block, idx) => (
               // @ts-ignore - TODO: jsonify

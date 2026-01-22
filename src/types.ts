@@ -150,14 +150,18 @@ export interface LeafletLinearDocument {
 
 export interface LeafletCanvas {}
 
+export interface LeafletDocumentContent {
+  pages: LeafletLinearDocument[] // TODO: this should support canvas but idk what that is yet
+}
+
 export interface LeafletDocument {
-  $type: 'pub.leaflet.document'
+  $type: 'site.standard.document'
   author: string
   coverImage?: Blob
   description: string
+  content: LeafletDocumentContent
   publishedAt: string // datetime
   tags?: string[]
-  pages: LeafletLinearDocument[] // TODO: this should support canvas but idk what that is yet
   theme?: string
   title: any // ignoring for now but included here, pub.leaflet.publication#theme
   publication?: string // aturi

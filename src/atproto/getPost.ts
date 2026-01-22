@@ -11,7 +11,7 @@ export const getPost = async (rkey: string, skipCache?: boolean) => {
   const repo = process.env.ATP_DID!
 
   const res = await ATP_AGENT.com.atproto.repo.getRecord({
-    collection: 'pub.leaflet.document',
+    collection: 'site.standard.document',
     repo,
     rkey,
   })
