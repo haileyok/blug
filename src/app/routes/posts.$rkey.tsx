@@ -44,7 +44,9 @@ export const meta: MetaFunction<typeof loader> = ({data}) => {
     {title: `${data?.post.title} | Hailey's Cool Site`},
     {
       name: 'description',
-      content: `${postText.split(' ').slice(0, 100).join(' ')}...`,
+      content: data?.post.description
+        ? data.post.description
+        : `${postText.split(' ').slice(0, 100).join(' ')}...`,
     },
     {
       name: 'og:title',
@@ -52,7 +54,9 @@ export const meta: MetaFunction<typeof loader> = ({data}) => {
     },
     {
       name: 'og:description',
-      content: `${postText.split(' ').slice(0, 100).join(' ')}...`,
+      content: data?.post.description
+        ? data.post.description
+        : `${postText.split(' ').slice(0, 100).join(' ')}...`,
     },
     ...(ogImageUrl
       ? [
