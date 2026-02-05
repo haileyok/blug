@@ -37,6 +37,18 @@ export default function About() {
       </div>
 
       <div className="flex flex-col gap-4">
+        <h2 className="text-2xl font-bold text-950">Community</h2>
+        <ul className="flex flex-col gap-2">
+          <WorkItem
+            company="ROOST"
+            href="https://roost.tools"
+            role="Technical Design Committee"
+            period="Dec 2025 – Present"
+          />
+        </ul>
+      </div>
+
+      <div className="flex flex-col gap-4">
         <h2 className="text-2xl font-bold text-950">Projects</h2>
         <ul className="flex flex-col gap-3">
           <ProjectItem
