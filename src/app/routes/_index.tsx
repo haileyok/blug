@@ -36,9 +36,9 @@ export default function Index() {
       </div>
 
       <p className="text-xl">
-        Software engineer, previously at Bluesky. These days I'm mostly
-        interested in online safety tooling, AT Protocol, and other social media
-        stuff. Sometimes I write about it here.
+        Software engineer. These days I'm mostly interested in online safety
+        tooling, AT Protocol, and other social media stuff. Sometimes I write
+        about it here.
       </p>
 
       <div className="flex flex-col gap-2">
@@ -51,7 +51,9 @@ export default function Index() {
                 new Date(a.publishedAt).getTime(),
             )
             // @ts-ignore - TODO: i think remix does something with jsonify? ugh i hate typescript lol
-            .map(post => <PostItem post={post} key={post.rkey} />)}
+            .map(post => (
+              <PostItem post={post} key={post.rkey} />
+            ))}
         </ul>
       </div>
     </div>
