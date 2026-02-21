@@ -19,18 +19,24 @@ export default function About() {
       </div>
 
       <p className="text-xl">
-        Software engineer, previously at Bluesky. These days I'm mostly
-        interested in online safety tooling, AT Protocol, and other social media
-        stuff. Sometimes I write about it here.
+        Software engineer. These days I'm mostly interested in online safety
+        tooling, AT Protocol, and other social media stuff. Sometimes I write
+        about it here.
       </p>
 
       <div className="flex flex-col gap-4">
         <h2 className="text-2xl font-bold text-950">Work</h2>
         <ul className="flex flex-col gap-2">
           <WorkItem
+            company="Discord"
+            href="https://discord.com"
+            role="Safety Engineering"
+            period="Feb 2025 - Present"
+          />
+          <WorkItem
             company="Bluesky"
             href="https://bsky.social"
-            role="Safety, Product (React Native)"
+            role="Safety Engineering, Product (React Native)"
             period="Jan 2024 – Dec 2025"
           />
         </ul>
