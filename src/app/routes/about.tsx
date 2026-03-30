@@ -31,8 +31,15 @@ export default function About() {
             company="Discord"
             href="https://discord.com"
             role="Safety Engineering"
-            period="Feb 2025 - Present"
+            period="Feb 2026 - Present"
           />
+          <WorkItem
+            company="Attie.ai (Bluesky)"
+            href="https://attie.ai"
+            role="Exploration, Agentic Product Engineering"
+            period="Jan 2026 - Feb 2026"
+          />
+
           <WorkItem
             company="Bluesky"
             href="https://bsky.social"
