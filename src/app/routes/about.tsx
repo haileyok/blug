@@ -88,7 +88,7 @@ export default function About() {
       <div className="flex flex-col gap-4">
         <h2 className="text-2xl font-bold text-950">Contact</h2>
         <ul className="flex flex-col gap-2">
-          <ContactItem label="Email" value="me@haileyok.com" />
+          <ContactItem label="Email" value="me@hailey.at" />
           <ContactItem label="Discord" value="haileyok" />
           <ContactItem label="Signal" value="haileyok.01" />
         </ul>
