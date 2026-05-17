@@ -19,9 +19,8 @@ export default function About() {
       </div>
 
       <p className="text-xl">
-        Software engineer. These days I'm mostly interested in online safety
-        tooling, AT Protocol, and other social media stuff. Sometimes I write
-        about it here.
+        Just a person interested in engineering, safety tooling, AT Protocol,
+        and agentic systems. Sometimes I write about it here.
       </p>
 
       <div className="flex flex-col gap-4">
@@ -64,6 +63,16 @@ export default function About() {
       <div className="flex flex-col gap-4">
         <h2 className="text-2xl font-bold text-950">Projects</h2>
         <ul className="flex flex-col gap-3">
+          <ProjectItem
+            name="Osprey"
+            description="High-performance safety rules engine for real-time event processing at scale."
+            href="https://github.com/roostorg/osprey"
+          />
+          <ProjectItem
+            name="victrola"
+            description="A self-modifying, TUI and Discord-facing, AI agent harness with parallel tool calling"
+            href="https://github.com/haileyok/victrola"
+          />
           <ProjectItem
             name="cocoon"
             description="ATProto PDS, written in Go"

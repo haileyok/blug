@@ -36,9 +36,8 @@ export default function Index() {
       </div>
 
       <p className="text-xl">
-        Software engineer. These days I'm mostly interested in online safety
-        tooling, AT Protocol, and other social media stuff. Sometimes I write
-        about it here.
+        Just a person interested in engineering, safety tooling, AT Protocol,
+        and agentic systems. Sometimes I write about it here.
       </p>
 
       <div className="flex flex-col gap-2">
