@@ -6,6 +6,7 @@ import {
   Scripts,
   ScrollRestoration,
   useLoaderData,
+  useLocation,
   useRouteError,
 } from '@remix-run/react'
 import {json, LinksFunction} from '@remix-run/node'
@@ -22,7 +23,7 @@ export const links: LinksFunction = () => [
     crossOrigin: 'anonymous',
   },
   {
-    href: 'https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap',
+    href: 'https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT@9..144,300..700,0..100&family=Newsreader:ital,opsz,wght@0,6..72,300..600;1,6..72,300..600&family=JetBrains+Mono:wght@400;500&display=swap',
     rel: 'stylesheet',
   },
 ]
@@ -36,6 +37,12 @@ export function Layout({children}: {children: React.ReactNode}) {
   const {profile} = useLoaderData<{
     profile: AppBskyActorDefs.ProfileViewDetailed
   }>()
+  const location = useLocation()
+
+  const isOn = (path: string) =>
+    path === '/'
+      ? location.pathname === '/'
+      : location.pathname.startsWith(path)
 
   return (
     <html lang="en">
@@ -46,41 +53,54 @@ export function Layout({children}: {children: React.ReactNode}) {
         <Links />
         <script async src="https://embed.bsky.app/static/embed.js" />
       </head>
-      <body className="flex flex-col h-screen justify-between bg-0 text-900 antialiased">
+      <body className="flex flex-col min-h-screen justify-between bg-0 text-900 antialiased font-serif">
         <div>
-          <header className="flex justify-between gap-1 mx-auto max-w-7xl pt-4 px-4">
-            <div className="flex shrink-0 gap-2">
-              {profile ? (
-                <a href="/">
+          <header className="mx-auto max-w-7xl pt-6 px-6">
+            <div className="flex items-center justify-between gap-4 border-b border-100 pb-5">
+              <a href="/" className="flex items-center gap-3 group">
+                {profile ? (
                   <img
-                    className="rounded-full w-14 h-14"
+                    className="rounded-full w-11 h-11 ring-1 ring-200 group-hover:ring-600 transition-all"
                     src={profile.avatar}
                     alt="Hailey's avatar"
                   />
-                </a>
-              ) : (
-                <div className="w-14 h-14 bg-100 rounded-full"></div>
-              )}
+                ) : (
+                  <div className="w-11 h-11 bg-100 rounded-full" />
+                )}
+                <span className="font-display text-xl tracking-tightest text-950 hidden sm:inline">
+                  hailey<span className="text-600">.</span>
+                </span>
+              </a>
+              <nav className="flex items-center gap-1 sm:gap-2">
+                <NavLink href="/" selected={isOn('/') && location.pathname === '/'}>
+                  Writing
+                </NavLink>
+                <NavLink href="/about" selected={isOn('/about')}>
+                  About
+                </NavLink>
+                <NavLink
+                  href="https://bsky.app/profile/haileyok.com"
+                  selected={false}>
+                  Bluesky
+                </NavLink>
+                <NavLink href="https://github.com/haileyok" selected={false}>
+                  GitHub
+                </NavLink>
+              </nav>
             </div>
-            <nav className="flex sm:gap-2">
-              <NavLink href="/" selected={false}>
-                Blog
-              </NavLink>
-              <NavLink href="/about" selected={false}>
-                About
-              </NavLink>
-              <NavLink
-                href="https://bsky.app/profile/haileyok.com"
-                selected={false}>
-                Bluesky
-              </NavLink>
-              <NavLink href="https://github.com/haileyok" selected={false}>
-                GitHub
-              </NavLink>
-            </nav>
           </header>
           <main>{children}</main>
         </div>
+        <footer className="mx-auto max-w-7xl w-full px-6 pb-6 pt-12">
+          <div className="border-t border-100 pt-5 flex items-center justify-between text-sm">
+            <span className="label">Made on AT Protocol</span>
+            <a
+              href="https://github.com/haileyok/blug"
+              className="text-500 hover:text-600 transition-colors font-mono text-xs">
+              source ↗
+            </a>
+          </div>
+        </footer>
         <ScrollRestoration />
         <Scripts />
       </body>
@@ -101,13 +121,21 @@ function NavLink({
   selected: boolean
   children: string
 }) {
-  const topClassName = selected ? 'h-1 bg-600' : 'h-1'
-  const textClassName = selected ? 'text-600' : 'text-500 hover:text-950'
+  const textClass = selected
+    ? 'text-950'
+    : 'text-500 hover:text-900'
+  const underlineClass = selected
+    ? 'bg-600'
+    : 'bg-transparent group-hover:bg-300'
 
   return (
-    <a href={href} className="transition-colors">
-      <div className={topClassName} />
-      <p className={`p-3 ${textClassName}`}>{children}</p>
+    <a href={href} className="group inline-flex flex-col px-2 py-1">
+      <span className={`font-sans text-sm transition-colors ${textClass}`}>
+        {children}
+      </span>
+      <span
+        className={`mt-1 h-px w-full transition-colors ${underlineClass}`}
+      />
     </a>
   )
 }
@@ -124,18 +152,24 @@ export function ErrorBoundary() {
         <Meta />
         <Links />
       </head>
-      <body className="bg-0 text-900 antialiased">
-        <div className="container mx-auto pt-10 md:pt-20 pb-20">
-          <h1 className="text-5xl md:text-6xl font-bold text-center text-950">
-            Uh...something went wrong.
+      <body className="bg-0 text-900 antialiased font-serif">
+        <div className="container mx-auto pt-10 md:pt-20 pb-20 text-center">
+          <p className="label mb-6">Error</p>
+          <h1 className="font-display text-5xl md:text-7xl tracking-tightest text-950">
+            Something broke.
           </h1>
           <div className="p-10 flex justify-center">
             <img
               src="/monkey.jpg"
               alt="Monkey muppet meme image"
-              className="rounded-lg shadow-md"
+              className="rounded-lg shadow-2xl shadow-black/40 max-w-sm"
             />
           </div>
+          <a
+            href="/"
+            className="inline-block font-mono text-xs text-600 hover:text-700 transition-colors">
+            ← back to writing
+          </a>
         </div>
         <Scripts />
       </body>

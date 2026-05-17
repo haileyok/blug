@@ -33,7 +33,33 @@ export default {
       950: '#fafafa',
       gray: '#ffffff',
     },
-    extend: {},
+    extend: {
+      fontFamily: {
+        display: ['Fraunces', 'ui-serif', 'Georgia', 'serif'],
+        serif: ['Newsreader', 'ui-serif', 'Georgia', 'serif'],
+        sans: [
+          'ui-sans-serif',
+          'system-ui',
+          '-apple-system',
+          'BlinkMacSystemFont',
+          'Segoe UI',
+          'sans-serif',
+        ],
+        mono: [
+          'JetBrains Mono',
+          'ui-monospace',
+          'SFMono-Regular',
+          'Menlo',
+          'monospace',
+        ],
+      },
+      letterSpacing: {
+        tightest: '-0.04em',
+      },
+      maxWidth: {
+        prose: '68ch',
+      },
+    },
   },
   plugins: [],
 } satisfies Config
