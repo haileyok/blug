@@ -35,9 +35,24 @@ export default {
     },
     extend: {
       fontFamily: {
-        display: ['Fraunces', 'ui-serif', 'Georgia', 'serif'],
-        serif: ['Newsreader', 'ui-serif', 'Georgia', 'serif'],
+        display: [
+          'Recursive',
+          'ui-sans-serif',
+          'system-ui',
+          '-apple-system',
+          'BlinkMacSystemFont',
+          'sans-serif',
+        ],
         sans: [
+          'ui-sans-serif',
+          'system-ui',
+          '-apple-system',
+          'BlinkMacSystemFont',
+          'Segoe UI',
+          'Helvetica Neue',
+          'sans-serif',
+        ],
+        serif: [
           'ui-sans-serif',
           'system-ui',
           '-apple-system',
@@ -46,7 +61,7 @@ export default {
           'sans-serif',
         ],
         mono: [
-          'JetBrains Mono',
+          'Recursive',
           'ui-monospace',
           'SFMono-Regular',
           'Menlo',

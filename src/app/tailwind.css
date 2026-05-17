@@ -5,16 +5,19 @@
 /*
  * Type system
  * -----------
- * display  → Fraunces (variable serif, used for headlines + wordmark)
- * serif    → Newsreader (long-form reading body)
- * mono     → JetBrains Mono (dates, code, small labels)
+ * Body: native OS sans (no webfont). Light, fast, personal — looks different
+ * on each OS rather than the generic AI-tasteful look.
+ *
+ * Recursive (variable): used for the wordmark, post titles, and mono labels.
+ * Two axes do real work:
+ *   - MONO  0 → 1  (proportional → monospaced)
+ *   - CASL  0 → 1  (linear → casual hand-feel)
  */
 
 :root {
   color-scheme: dark;
   --grain-opacity: 0.035;
   --accent: #60a5fa;
-  --accent-strong: #3b82f6;
 }
 
 html {
@@ -24,15 +27,14 @@ html {
 }
 
 body {
-  font-family: 'Newsreader', ui-serif, Georgia, serif;
-  font-feature-settings: 'kern', 'liga', 'calt', 'onum';
-  font-size: 18px;
+  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+    'Segoe UI', 'Helvetica Neue', sans-serif;
+  font-size: 17px;
   line-height: 1.6;
   position: relative;
 }
 
-/* Subtle film grain — sits above the bg but below content, hidden from screen
-   readers, fixed so it doesn't drag scroll perf. */
+/* Subtle film grain — fixed so it doesn't affect scroll perf. */
 body::before {
   content: '';
   position: fixed;
@@ -44,43 +46,40 @@ body::before {
   mix-blend-mode: overlay;
 }
 
-/* Make sure interactive content sits above the grain layer. */
 body > * {
   position: relative;
   z-index: 1;
 }
 
-/* Selection in the brand accent — restrained, used everywhere. */
 ::selection {
   background: rgba(96, 165, 250, 0.35);
   color: #fafafa;
 }
 
-/* Variable-font tuning for Fraunces — the SOFT axis gives it a friendlier,
-   slightly quirky personality without being twee. */
+/* Recursive display: proportional + a touch of casual. Crisp at large sizes,
+   slightly playful in the curves. */
 .font-display {
-  font-variation-settings: 'opsz' 144, 'SOFT' 50, 'wght' 500;
-  letter-spacing: -0.02em;
+  font-variation-settings: 'MONO' 0, 'CASL' 0.4, 'wght' 600, 'slnt' 0;
+  letter-spacing: -0.015em;
 }
 
-/* Optical sizing on Newsreader at body size for refined letterforms. */
-.font-serif {
-  font-optical-sizing: auto;
+/* Recursive mono: full mono, linear (no casual), regular weight. */
+.font-mono {
+  font-variation-settings: 'MONO' 1, 'CASL' 0, 'wght' 450, 'slnt' 0;
 }
 
-/* Smooth focus ring in the accent color, since the dark bg can swallow the
-   browser default. */
 :focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 3px;
   border-radius: 2px;
 }
 
-/* Tiny utility for the mono section labels used across pages. */
+/* Small uppercase mono labels used for section headers. */
 .label {
-  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-family: 'Recursive', ui-monospace, monospace;
+  font-variation-settings: 'MONO' 1, 'CASL' 0, 'wght' 500;
   font-size: 0.72rem;
-  letter-spacing: 0.18em;
+  letter-spacing: 0.16em;
   text-transform: uppercase;
   color: #71717a;
 }

@@ -28,39 +28,19 @@ export default function Index() {
   }>()
 
   return (
-    <div className="container mx-auto pt-16 md:pt-28 pb-24">
-      <section className="grid md:grid-cols-12 gap-8 md:gap-12 mb-20 md:mb-28">
-        <div className="md:col-span-8">
-          <p className="label mb-5">Hailey · Software</p>
-          <h1 className="font-display tracking-tightest text-950 text-5xl md:text-7xl leading-[0.95]">
-            Notes on{' '}
-            <em className="font-display italic text-600" style={{fontVariationSettings: "'opsz' 144, 'SOFT' 100, 'wght' 400"}}>
-              building
-            </em>
-            <span className="text-500">,</span>{' '}
-            <em className="font-display italic text-600" style={{fontVariationSettings: "'opsz' 144, 'SOFT' 100, 'wght' 400"}}>
-              breaking
-            </em>
-            <span className="text-500">,</span> and{' '}
-            <em className="font-display italic text-600" style={{fontVariationSettings: "'opsz' 144, 'SOFT' 100, 'wght' 400"}}>
-              shipping
-            </em>
-            <span className="text-500">.</span>
-          </h1>
-        </div>
-        <div className="md:col-span-4 md:pt-4 flex flex-col gap-4">
-          <p className="font-serif text-lg leading-relaxed text-900 max-w-prose">
-            Engineering, safety tooling, AT Protocol, agentic systems. Mostly
-            thinking out loud.
-          </p>
-          <p className="font-mono text-xs text-500">
-            Currently at Discord on Safety Engineering.
-          </p>
-        </div>
+    <div className="container mx-auto pt-12 md:pt-20 pb-24">
+      <section className="mb-16 md:mb-20 flex flex-col gap-5">
+        <h1 className="font-display text-4xl md:text-5xl text-950 leading-[1.05]">
+          It's Hailey<span className="text-600">.</span>
+        </h1>
+        <p className="text-lg leading-relaxed text-900 max-w-prose">
+          Just a person interested in engineering, safety tooling, AT Protocol,
+          and agentic systems. Sometimes I write about it here.
+        </p>
       </section>
 
       <section>
-        <div className="flex items-baseline justify-between mb-6 border-b border-100 pb-3">
+        <div className="flex items-baseline justify-between mb-5 border-b border-100 pb-3">
           <h2 className="label">Recent writing</h2>
           <span className="label">{posts.length} posts</span>
         </div>
@@ -87,26 +67,26 @@ function PostItem({post}: {post: LeafletDocument}) {
     <li>
       <a
         href={`/posts/${post.rkey}`}
-        className="group grid md:grid-cols-12 gap-2 md:gap-6 py-5 -mx-3 px-3 rounded-md transition-colors hover:bg-50">
-        <time
-          className="md:col-span-2 text-500 text-xs font-mono uppercase tracking-wider self-baseline pt-1"
-          dateTime={date.toISOString()}>
-          {date.toLocaleDateString('en-US', {
-            year: 'numeric',
-            month: 'short',
-            day: 'numeric',
-          })}
-        </time>
-        <div className="md:col-span-10 flex flex-col gap-1">
-          <h3 className="font-display text-2xl md:text-3xl tracking-tightest text-900 group-hover:text-600 transition-colors leading-tight">
+        className="group flex flex-col gap-1.5 py-4 -mx-3 px-3 rounded-md transition-colors hover:bg-50">
+        <div className="flex items-baseline gap-3 flex-wrap">
+          <h3 className="font-display text-xl md:text-2xl text-900 group-hover:text-600 transition-colors leading-tight">
             {post.title}
           </h3>
-          {post.description ? (
-            <p className="text-500 text-base leading-relaxed line-clamp-2">
-              {post.description}
-            </p>
-          ) : null}
+          <time
+            className="font-mono text-xs text-500 uppercase tracking-wider"
+            dateTime={date.toISOString()}>
+            {date.toLocaleDateString('en-US', {
+              year: 'numeric',
+              month: 'short',
+              day: 'numeric',
+            })}
+          </time>
         </div>
+        {post.description ? (
+          <p className="text-500 text-base leading-relaxed line-clamp-2">
+            {post.description}
+          </p>
+        ) : null}
       </a>
     </li>
   )

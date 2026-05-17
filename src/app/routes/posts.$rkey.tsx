@@ -88,7 +88,7 @@ export default function Posts() {
           className="label hover:text-600 transition-colors w-fit">
           ← Writing
         </a>
-        <h1 className="font-display tracking-tightest text-950 text-4xl md:text-6xl leading-[1.02]">
+        <h1 className="font-display text-950 text-4xl md:text-6xl leading-[1.02]">
           {post.title}
         </h1>
         <div className="flex items-center gap-3 text-xs font-mono uppercase tracking-wider">
@@ -148,19 +148,19 @@ function Header({block}: {block: LeafletHeaderBlock}) {
   switch (block.level) {
     case 1:
       return (
-        <h1 className="font-display tracking-tightest text-3xl md:text-4xl text-950 pt-6 mt-2 leading-tight">
+        <h1 className="font-display text-3xl md:text-4xl text-950 pt-6 mt-2 leading-tight">
           {block.plaintext}
         </h1>
       )
     case 2:
       return (
-        <h2 className="font-display tracking-tightest text-2xl md:text-3xl text-950 pt-6 mt-2 leading-tight">
+        <h2 className="font-display text-2xl md:text-3xl text-950 pt-6 mt-2 leading-tight">
           {block.plaintext}
         </h2>
       )
     case 3:
       return (
-        <h3 className="font-display tracking-tightest text-xl md:text-2xl text-900 pt-4 leading-tight">
+        <h3 className="font-display text-xl md:text-2xl text-900 pt-4 leading-tight">
           {block.plaintext}
         </h3>
       )
@@ -203,7 +203,7 @@ function Text({
         ? 'text-base'
         : 'text-xl md:text-2xl'
 
-  const className = `${sizeClass} font-serif text-900 leading-relaxed`
+  const className = `${sizeClass} font-sans text-900 leading-relaxed`
 
   return <p className={className}>{renderRichText(plaintext, facets)}</p>
 }
@@ -281,7 +281,7 @@ function renderRichText(
 
 function BlockQuote({block}: {block: LeafletBlockquoteBlock}) {
   return (
-    <blockquote className="border-l-2 border-600 pl-5 my-2 italic font-serif text-xl md:text-2xl text-900 leading-relaxed">
+    <blockquote className="border-l-2 border-600 pl-5 my-2 italic font-sans text-xl md:text-2xl text-900 leading-relaxed">
       {block.plaintext}
     </blockquote>
   )
@@ -343,11 +343,11 @@ function Website({block, did}: {block: LeafletWebsiteBlock; did: string}) {
       href={block.src}
       className="border border-100 rounded-md flex gap-4 p-4 bg-50 hover:bg-100 hover:border-300 transition-colors group my-2">
       <div className="flex-1 min-w-0">
-        <h3 className="font-display tracking-tightest text-lg md:text-xl text-950 truncate group-hover:text-600 transition-colors">
+        <h3 className="font-display text-lg md:text-xl text-950 truncate group-hover:text-600 transition-colors">
           {block.title || block.src}
         </h3>
         {block.description ? (
-          <p className="text-500 mt-1 line-clamp-2 font-serif text-sm">
+          <p className="text-500 mt-1 line-clamp-2 font-sans text-sm">
             {block.description}
           </p>
         ) : null}
@@ -405,7 +405,7 @@ function Error() {
   return (
     <div className="container mx-auto pt-16 md:pt-28 pb-24 text-center">
       <p className="label mb-6">404</p>
-      <h1 className="font-display tracking-tightest text-5xl md:text-7xl text-950 leading-[0.95]">
+      <h1 className="font-display text-5xl md:text-7xl text-950 leading-[0.95]">
         That post wandered off.
       </h1>
       <div className="p-10 flex justify-center">

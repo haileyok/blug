@@ -23,7 +23,7 @@ export const links: LinksFunction = () => [
     crossOrigin: 'anonymous',
   },
   {
-    href: 'https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT@9..144,300..700,0..100&family=Newsreader:ital,opsz,wght@0,6..72,300..600;1,6..72,300..600&family=JetBrains+Mono:wght@400;500&display=swap',
+    href: 'https://fonts.googleapis.com/css2?family=Recursive:slnt,wght,CASL,MONO@-15..0,300..900,0..1,0..1&display=swap',
     rel: 'stylesheet',
   },
 ]
@@ -53,7 +53,7 @@ export function Layout({children}: {children: React.ReactNode}) {
         <Links />
         <script async src="https://embed.bsky.app/static/embed.js" />
       </head>
-      <body className="flex flex-col min-h-screen justify-between bg-0 text-900 antialiased font-serif">
+      <body className="flex flex-col min-h-screen justify-between bg-0 text-900 antialiased font-sans">
         <div>
           <header className="mx-auto max-w-7xl pt-6 px-6">
             <div className="flex items-center justify-between gap-4 border-b border-100 pb-5">
@@ -67,7 +67,7 @@ export function Layout({children}: {children: React.ReactNode}) {
                 ) : (
                   <div className="w-11 h-11 bg-100 rounded-full" />
                 )}
-                <span className="font-display text-xl tracking-tightest text-950 hidden sm:inline">
+                <span className="font-display text-xl text-950 hidden sm:inline">
                   hailey<span className="text-600">.</span>
                 </span>
               </a>
@@ -152,10 +152,10 @@ export function ErrorBoundary() {
         <Meta />
         <Links />
       </head>
-      <body className="bg-0 text-900 antialiased font-serif">
+      <body className="bg-0 text-900 antialiased font-sans">
         <div className="container mx-auto pt-10 md:pt-20 pb-20 text-center">
           <p className="label mb-6">Error</p>
-          <h1 className="font-display text-5xl md:text-7xl tracking-tightest text-950">
+          <h1 className="font-display text-5xl md:text-7xl text-950">
             Something broke.
           </h1>
           <div className="p-10 flex justify-center">

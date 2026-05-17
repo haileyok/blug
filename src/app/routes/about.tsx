@@ -13,29 +13,15 @@ export const meta: MetaFunction = () => {
 
 export default function About() {
   return (
-    <div className="container mx-auto pt-16 md:pt-28 pb-24">
-      <section className="grid md:grid-cols-12 gap-8 md:gap-12 mb-20">
-        <div className="md:col-span-8">
-          <p className="label mb-5">About</p>
-          <h1 className="font-display tracking-tightest text-950 text-5xl md:text-7xl leading-[0.95]">
-            Hi, I'm{' '}
-            <em
-              className="font-display italic text-600"
-              style={{
-                fontVariationSettings:
-                  "'opsz' 144, 'SOFT' 100, 'wght' 400",
-              }}>
-              Hailey
-            </em>
-            .
-          </h1>
-        </div>
-        <div className="md:col-span-4 md:pt-4">
-          <p className="font-serif text-lg leading-relaxed text-900 max-w-prose">
-            Just a person interested in engineering, safety tooling, AT
-            Protocol, and agentic systems. Sometimes I write about it here.
-          </p>
-        </div>
+    <div className="container mx-auto pt-12 md:pt-20 pb-24">
+      <section className="mb-16 md:mb-20 flex flex-col gap-5">
+        <h1 className="font-display text-4xl md:text-5xl text-950 leading-[1.05]">
+          About<span className="text-600">.</span>
+        </h1>
+        <p className="text-lg leading-relaxed text-900 max-w-prose">
+          Just a person interested in engineering, safety tooling, AT Protocol,
+          and agentic systems. Sometimes I write about it here.
+        </p>
       </section>
 
       <Section label="Work">
@@ -113,11 +99,9 @@ function Section({
   children: React.ReactNode
 }) {
   return (
-    <section className="grid md:grid-cols-12 gap-4 md:gap-12 py-8 border-t border-100">
-      <div className="md:col-span-3 md:pt-1">
-        <h2 className="label">{label}</h2>
-      </div>
-      <ul className="md:col-span-9 flex flex-col gap-4">{children}</ul>
+    <section className="py-8 border-t border-100">
+      <h2 className="label mb-5">{label}</h2>
+      <ul className="flex flex-col gap-4">{children}</ul>
     </section>
   )
 }
@@ -134,17 +118,17 @@ function WorkItem({
   period: string
 }) {
   return (
-    <li className="flex flex-col sm:flex-row sm:items-baseline gap-1 sm:gap-4 group">
+    <li className="flex flex-col sm:flex-row sm:items-baseline gap-1 sm:gap-3 group">
       <a
         href={href}
         target="_blank"
         rel="noreferrer"
-        className="font-display text-xl tracking-tightest text-950 group-hover:text-600 transition-colors">
+        className="font-display text-lg text-950 group-hover:text-600 transition-colors shrink-0">
         {company}
       </a>
-      <span className="text-400 text-sm hidden sm:inline">·</span>
-      <span className="text-900 font-serif">{role}</span>
-      <span className="text-500 text-xs font-mono uppercase tracking-wider sm:ml-auto">
+      <span className="text-400 hidden sm:inline">·</span>
+      <span className="text-900">{role}</span>
+      <span className="text-500 text-xs font-mono uppercase tracking-wider sm:ml-auto shrink-0">
         {period}
       </span>
     </li>
@@ -167,7 +151,7 @@ function ProjectItem({
         className="group flex flex-col gap-1 -mx-3 px-3 py-2 rounded-md hover:bg-50 transition-colors"
         target="_blank"
         rel="noreferrer">
-        <span className="font-display text-xl tracking-tightest text-950 group-hover:text-600 transition-colors flex items-center gap-2">
+        <span className="font-display text-lg text-950 group-hover:text-600 transition-colors inline-flex items-center gap-2">
           {name}
           <span className="text-400 text-sm font-mono opacity-0 group-hover:opacity-100 transition-opacity">
             ↗
@@ -184,7 +168,7 @@ function LinkItem({name, href}: {name: string; href: string}) {
     <li>
       <a
         href={href}
-        className="font-display text-xl text-900 hover:text-600 transition-colors inline-flex items-center gap-2 group"
+        className="font-display text-lg text-900 hover:text-600 transition-colors inline-flex items-center gap-2 group"
         target="_blank"
         rel="noreferrer">
         {name}
@@ -199,7 +183,7 @@ function LinkItem({name, href}: {name: string; href: string}) {
 function ContactItem({label, value}: {label: string; value: string}) {
   return (
     <li className="flex items-baseline gap-4">
-      <span className="text-500 w-20 text-xs font-mono uppercase tracking-wider">
+      <span className="text-500 w-20 text-xs font-mono uppercase tracking-wider shrink-0">
         {label}
       </span>
       <span className="text-900 font-mono text-sm">{value}</span>
