@@ -1,6 +1,6 @@
 import {ATP_AGENT} from './agent.js'
 import {getCachedPost, setCachedPost} from '../redis/redis'
-import {LeafletDocument} from 'src/types.js'
+import {Document} from 'src/types.js'
 
 export const getPost = async (rkey: string, skipCache?: boolean) => {
   const cachedRes = await getCachedPost(rkey)
@@ -20,7 +20,7 @@ export const getPost = async (rkey: string, skipCache?: boolean) => {
     throw new Error('Failed to get post.')
   }
 
-  const post = res.data.value as LeafletDocument
+  const post = res.data.value as Document
 
   await setCachedPost(rkey, post)
 
