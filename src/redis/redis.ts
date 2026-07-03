@@ -1,6 +1,6 @@
 import Redis from 'ioredis'
 import {AppBskyActorDefs} from '@atproto/api'
-import {LeafletDocument} from '../types'
+import {Document} from '../types'
 
 export const REDIS_CLIENT = new Redis({
   port: 6379,
@@ -12,10 +12,10 @@ export const getCachedPosts = async () => {
   if (!res) {
     return null
   }
-  return JSON.parse(res) as LeafletDocument[]
+  return JSON.parse(res) as Document[]
 }
 
-export const setCachedPosts = async (posts: LeafletDocument[]) => {
+export const setCachedPosts = async (posts: Document[]) => {
   await REDIS_CLIENT.set('posts', JSON.stringify(posts), 'EX', 60)
 }
 
@@ -24,10 +24,10 @@ export const getCachedPost = async (rkey: string) => {
   if (!res) {
     return null
   }
-  return JSON.parse(res) as LeafletDocument
+  return JSON.parse(res) as Document
 }
 
-export const setCachedPost = async (rkey: string, post: LeafletDocument) => {
+export const setCachedPost = async (rkey: string, post: Document) => {
   await REDIS_CLIENT.set(rkey, JSON.stringify(post), 'EX', 60 * 10)
 }
 

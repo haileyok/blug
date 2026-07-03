@@ -4,15 +4,23 @@ import {getPost, getProfile} from '../../atproto'
 import {json, LoaderFunctionArgs, MetaFunction} from '@remix-run/node'
 import {AppBskyActorDefs} from '@atproto/api'
 import {
+  Document,
+  isOffprintDocument,
   LeafletBlock,
   LeafletBlockquoteBlock,
-  LeafletBskyPostBlock,
   LeafletCodeBlock,
-  LeafletDocument,
   LeafletFacet,
-  LeafletHeaderBlock,
   LeafletImageBlock,
   LeafletWebsiteBlock,
+  OffprintBlock,
+  OffprintBlockquoteBlock,
+  OffprintCalloutBlock,
+  OffprintCodeBlock,
+  OffprintFacet,
+  OffprintImageBlock,
+  OffprintListItem,
+  OffprintTaskItem,
+  OffprintTextBlock,
 } from 'src/types'
 import {getDid} from 'src/atproto/getDid'
 import {useEffect, useRef} from 'react'
@@ -24,28 +32,68 @@ export const loader = async ({params}: LoaderFunctionArgs) => {
   return json({did: getDid(), post, profile})
 }
 
-export const meta: MetaFunction<typeof loader> = ({data}) => {
+function cdnUrl(did: string, link: string, fullsize = true) {
+  return `https://cdn.bsky.app/img/feed_${
+    fullsize ? 'fullsize' : 'thumbnail'
+  }/plain/${did}/${link}@jpeg`
+}
+
+/** Best-effort preview text + first image, for meta tags. */
+function extractPreview(
+  post: Document,
+  did: string,
+): {postText: string; ogImageUrl?: string} {
   let postText = ''
-  let ogImageUrl
-  if (data) {
-    for (const block of data.post.content.pages[0].blocks) {
+  let ogImageUrl: string | undefined
+
+  if (isOffprintDocument(post)) {
+    for (const block of post.content.items) {
+      if (block.$type === 'app.offprint.block.text') {
+        postText += `\n${block.plaintext}`
+      } else if (
+        !ogImageUrl &&
+        block.$type === 'app.offprint.block.image' &&
+        (block.image ?? block.blob)
+      ) {
+        ogImageUrl = cdnUrl(did, (block.image ?? block.blob)!.ref.$link)
+      }
+    }
+  } else {
+    for (const block of post.content.pages[0].blocks) {
       if (block.block.$type === 'pub.leaflet.blocks.text') {
         postText += `\n${block.block.plaintext}`
       } else if (
         !ogImageUrl &&
         block.block.$type === 'pub.leaflet.blocks.image'
       ) {
-        ogImageUrl = `https://cdn.bsky.app/img/feed_fullsize/plain/${data.did}/${block.block.image.ref.$link}@jpeg`
+        ogImageUrl = cdnUrl(did, block.block.image.ref.$link)
       }
     }
   }
+
+  return {postText, ogImageUrl}
+}
+
+/** Leaflet carries `description`; Offprint carries `textContent`. */
+function postDescription(post: Document): string | undefined {
+  return 'description' in post ? post.description : post.textContent
+}
+
+export const meta: MetaFunction<typeof loader> = ({data}) => {
+  const post = data ? (data.post as unknown as Document) : undefined
+  const {postText, ogImageUrl} =
+    data && post
+      ? extractPreview(post, data.did!)
+      : {postText: '', ogImageUrl: undefined as string | undefined}
+
+  const description = post ? postDescription(post) : undefined
 
   return [
     {title: `${data?.post.title} | Hailey's Cool Site`},
     {
       name: 'description',
-      content: data?.post.description
-        ? data.post.description
+      content: description
+        ? description
         : `${postText.split(' ').slice(0, 100).join(' ')}...`,
     },
     {
@@ -54,8 +102,8 @@ export const meta: MetaFunction<typeof loader> = ({data}) => {
     },
     {
       name: 'og:description',
-      content: data?.post.description
-        ? data.post.description
+      content: description
+        ? description
         : `${postText.split(' ').slice(0, 100).join(' ')}...`,
     },
     ...(ogImageUrl
@@ -72,9 +120,13 @@ export const meta: MetaFunction<typeof loader> = ({data}) => {
 export default function Posts() {
   const {did, post, profile} = useLoaderData<{
     did: string
-    post: LeafletDocument
+    post: Document
     profile: AppBskyActorDefs.ProfileViewDetailed
   }>()
+
+  // Remix wraps loader data in Jsonify (making some fields optional). The
+  // record came straight from the PDS and we know its shape, so cast back.
+  const doc = post as unknown as Document
 
   if (!post) {
     return <Error />
@@ -89,15 +141,15 @@ export default function Posts() {
           ← Writing
         </a>
         <h1 className="font-display text-950 text-4xl md:text-6xl leading-[1.02]">
-          {post.title}
+          {doc.title}
         </h1>
         <div className="flex items-center gap-3 text-xs font-mono uppercase tracking-wider">
           <span className="text-500">{profile.displayName}</span>
           <span className="text-300">·</span>
           <time
             className="text-500"
-            dateTime={new Date(post.publishedAt).toISOString()}>
-            {new Date(post.publishedAt).toLocaleDateString('en-US', {
+            dateTime={new Date(doc.publishedAt).toISOString()}>
+            {new Date(doc.publishedAt).toLocaleDateString('en-US', {
               year: 'numeric',
               month: 'long',
               day: 'numeric',
@@ -107,14 +159,21 @@ export default function Posts() {
       </header>
 
       <div className="flex flex-col gap-5 max-w-prose">
-        {post.content.pages.map((page, idx) => (
-          <div className="flex flex-col gap-5" key={idx}>
-            {page.blocks.map((block, idx) => (
-              // @ts-ignore - TODO: jsonify
-              <Block block={block} did={did} key={idx} />
-            ))}
-          </div>
-        ))}
+        {isOffprintDocument(doc) ? (
+          doc.content.items.map((block, idx) => (
+            // @ts-ignore - TODO: jsonify
+            <OffprintBlockRenderer block={block} did={did} key={idx} />
+          ))
+        ) : (
+          doc.content.pages.map((page, idx) => (
+            <div className="flex flex-col gap-5" key={idx}>
+              {page.blocks.map((block, idx) => (
+                // @ts-ignore - TODO: jsonify
+                <Block block={block} did={did} key={idx} />
+              ))}
+            </div>
+          ))
+        )}
       </div>
     </article>
   )
@@ -124,7 +183,9 @@ function Block({block, did}: {block: LeafletBlock; did: string}) {
   const b = block.block
   switch (b.$type) {
     case 'pub.leaflet.blocks.header':
-      return <Header block={b} />
+      return (
+        <Header plaintext={b.plaintext} level={b.level} facets={b.facets} />
+      )
     case 'pub.leaflet.blocks.text':
       return (
         <Text plaintext={b.plaintext} textSize={b.textSize} facets={b.facets} />
@@ -140,46 +201,55 @@ function Block({block, did}: {block: LeafletBlock; did: string}) {
     case 'pub.leaflet.blocks.website':
       return <Website block={b} did={did} />
     case 'pub.leaflet.blocks.bskyPost':
-      return <BskyPost block={b} />
+      return <BskyPost uri={b.postRef.uri} />
   }
 }
 
-function Header({block}: {block: LeafletHeaderBlock}) {
-  switch (block.level) {
+function Header({
+  plaintext,
+  level,
+  facets,
+}: {
+  plaintext: string
+  level?: 1 | 2 | 3 | 4 | 5 | 6
+  facets?: LeafletFacet[] | OffprintFacet[]
+}) {
+  const children = renderRichText(plaintext, facets)
+  switch (level) {
     case 1:
       return (
         <h1 className="font-display text-3xl md:text-4xl text-950 pt-6 mt-2 leading-tight">
-          {block.plaintext}
+          {children}
         </h1>
       )
     case 2:
       return (
         <h2 className="font-display text-2xl md:text-3xl text-950 pt-6 mt-2 leading-tight">
-          {block.plaintext}
+          {children}
         </h2>
       )
     case 3:
       return (
         <h3 className="font-display text-xl md:text-2xl text-900 pt-4 leading-tight">
-          {block.plaintext}
+          {children}
         </h3>
       )
     case 4:
       return (
         <h4 className="font-display text-lg md:text-xl text-900 pt-4 leading-tight">
-          {block.plaintext}
+          {children}
         </h4>
       )
     case 5:
       return (
         <h5 className="font-display text-base md:text-lg text-900 pt-4 leading-tight">
-          {block.plaintext}
+          {children}
         </h5>
       )
     case 6:
       return (
         <h6 className="font-mono uppercase tracking-wider text-sm text-500 pt-4">
-          {block.plaintext}
+          {children}
         </h6>
       )
   }
@@ -193,7 +263,7 @@ function Text({
   textSize = 'default',
 }: {
   plaintext: string
-  facets?: LeafletFacet[]
+  facets?: LeafletFacet[] | OffprintFacet[]
   textSize?: 'default' | 'small' | 'large'
 }) {
   const sizeClass =
@@ -210,7 +280,7 @@ function Text({
 
 function renderRichText(
   text: string,
-  facets?: LeafletFacet[],
+  facets?: LeafletFacet[] | OffprintFacet[],
 ): React.ReactNode {
   if (!facets?.length) {
     return text
@@ -239,32 +309,68 @@ function renderRichText(
     let element: React.ReactNode = facetText
 
     for (const feature of facet.features) {
-      switch (feature.$type) {
-        case 'pub.leaflet.richtext.facet#bold':
+      // Feature types share their suffix (bold, italic, ...) across Leaflet
+      // (`pub.leaflet.richtext.facet#bold`) and Offprint
+      // (`app.offprint.richtext.facet#bold`), so match on that suffix.
+      const kind = feature.$type.split('#')[1]
+      switch (kind) {
+        case 'bold':
           element = <strong key={`bold-${i}`}>{element}</strong>
           break
-        case 'pub.leaflet.richtext.facet#italic':
+        case 'italic':
           element = <em key={`italic-${i}`}>{element}</em>
           break
-        case 'pub.leaflet.richtext.facet#strikethrough':
+        case 'underline':
+          element = <u key={`underline-${i}`}>{element}</u>
+          break
+        case 'strikethrough':
           element = <s key={`strike-${i}`}>{element}</s>
           break
-        case 'pub.leaflet.richtext.facet#link':
+        case 'code':
+          element = (
+            <code
+              key={`code-${i}`}
+              className="bg-50 text-600 px-1.5 py-0.5 rounded text-[0.85em] font-mono border border-100">
+              {element}
+            </code>
+          )
+          break
+        case 'highlight':
+          element = (
+            <mark
+              key={`highlight-${i}`}
+              className="bg-100 rounded px-1"
+              style={
+                'color' in feature && feature.color
+                  ? {backgroundColor: feature.color}
+                  : undefined
+              }>
+              {element}
+            </mark>
+          )
+          break
+        case 'link':
           element = (
             <Link
               key={`link-${i}`}
-              href={feature.uri}
+              href={(feature as {uri: string}).uri}
               className="text-600 hover:text-700 underline underline-offset-2">
               {element}
             </Link>
           )
           break
-        case 'pub.leaflet.richtext.facet#code':
+        case 'mention':
           element = (
-            <code className="bg-50 text-600 px-1.5 py-0.5 rounded text-[0.85em] font-mono border border-100">
+            <Link
+              key={`mention-${i}`}
+              href={`https://bsky.app/profile/${
+                (feature as {did: string}).did
+              }`}
+              className="text-600 hover:text-700">
               {element}
-            </code>
+            </Link>
           )
+          break
       }
     }
 
@@ -304,12 +410,12 @@ function HorizontalRule() {
 }
 
 function Image({block, did}: {block: LeafletImageBlock; did: string}) {
-  const cdnUrl = `https://cdn.bsky.app/img/feed_fullsize/plain/${did}/${block.image.ref.$link}@jpeg`
+  const src = cdnUrl(did, block.image.ref.$link)
 
   return (
     <figure className="my-4 -mx-2 md:-mx-8">
       <img
-        src={cdnUrl}
+        src={src}
         alt={block.alt}
         className="rounded-md shadow-2xl shadow-black/40 max-w-full mx-auto"
       />
@@ -328,11 +434,11 @@ function Website({block, did}: {block: LeafletWebsiteBlock; did: string}) {
       return null
     }
 
-    const cdnUrl = `https://cdn.bsky.app/img/feed_thumbnail/plain/${did}/${block.previewImage.ref.$link}@jpeg`
+    const src = cdnUrl(did, block.previewImage.ref.$link, false)
 
     return (
       <img
-        src={cdnUrl}
+        src={src}
         className="rounded-lg h-40 object-cover flex-shrink-0"
       />
     )
@@ -366,7 +472,7 @@ function Website({block, did}: {block: LeafletWebsiteBlock; did: string}) {
   )
 }
 
-function BskyPost({block}: {block: LeafletBskyPostBlock}) {
+function BskyPost({uri}: {uri: string}) {
   const containerRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -374,7 +480,7 @@ function BskyPost({block}: {block: LeafletBskyPostBlock}) {
 
     const blockquote = document.createElement('blockquote')
     blockquote.className = 'bluesky-embed'
-    blockquote.dataset.blueskyUri = block.postRef.uri
+    blockquote.dataset.blueskyUri = uri
     containerRef.current.appendChild(blockquote)
 
     if (
@@ -396,9 +502,187 @@ function BskyPost({block}: {block: LeafletBskyPostBlock}) {
         containerRef.current.innerHTML = ''
       }
     }
-  }, [block.postRef.uri])
+  }, [uri])
 
   return <div ref={containerRef} className="flex justify-center my-4" />
+}
+
+// ---------------------------------------------------------------------------
+// Offprint (app.offprint.*) block rendering.
+// ---------------------------------------------------------------------------
+
+function OffprintBlockRenderer({
+  block,
+  did,
+}: {
+  block: OffprintBlock
+  did: string
+}) {
+  switch (block.$type) {
+    case 'app.offprint.block.text':
+      return <OffprintText block={block} />
+    case 'app.offprint.block.heading':
+      return (
+        <Header
+          plaintext={block.plaintext}
+          level={block.level}
+          facets={block.facets}
+        />
+      )
+    case 'app.offprint.block.blockquote':
+      return <OffprintBlockquote block={block} />
+    case 'app.offprint.block.callout':
+      return <OffprintCallout block={block} />
+    case 'app.offprint.block.bulletList':
+      return <OffprintList children={block.children} ordered={false} />
+    case 'app.offprint.block.orderedList':
+      return (
+        <OffprintList
+          children={block.children}
+          ordered={true}
+          start={block.start}
+        />
+      )
+    case 'app.offprint.block.taskList':
+      return <OffprintTaskList children={block.children} />
+    case 'app.offprint.block.image':
+      return <OffprintImage block={block} did={did} />
+    case 'app.offprint.block.codeBlock':
+      return <OffprintCode block={block} />
+    case 'app.offprint.block.blueskyPost':
+      return <BskyPost uri={block.post.uri} />
+    case 'app.offprint.block.horizontalRule':
+      return <HorizontalRule />
+  }
+}
+
+function OffprintText({block}: {block: OffprintTextBlock}) {
+  const alignClass =
+    block.textAlign === 'center'
+      ? 'text-center'
+      : block.textAlign === 'right'
+        ? 'text-right'
+        : block.textAlign === 'justify'
+          ? 'text-justify'
+          : ''
+
+  return (
+    <div className={alignClass}>
+      <Text plaintext={block.plaintext} facets={block.facets} />
+    </div>
+  )
+}
+
+function OffprintBlockquote({block}: {block: OffprintBlockquoteBlock}) {
+  return (
+    <blockquote className="border-l-2 border-600 pl-5 my-2 italic font-sans text-xl md:text-2xl text-900 leading-relaxed flex flex-col gap-3">
+      {block.content.map((c, i) => {
+        if (c.$type === 'app.offprint.block.heading') {
+          return (
+            <Header
+              key={i}
+              plaintext={c.plaintext}
+              level={c.level}
+              facets={c.facets}
+            />
+          )
+        }
+        return (
+          <p key={i} className="leading-relaxed">
+            {renderRichText(c.plaintext, c.facets)}
+          </p>
+        )
+      })}
+    </blockquote>
+  )
+}
+
+function OffprintCallout({block}: {block: OffprintCalloutBlock}) {
+  return (
+    <div className="my-4 flex gap-3 items-start rounded-md border border-100 bg-50 p-4">
+      {block.emoji ? <span className="text-xl leading-none">{block.emoji}</span> : null}
+      <p className="font-sans text-900 leading-relaxed text-lg flex-1 m-0">
+        {renderRichText(block.plaintext, block.facets)}
+      </p>
+    </div>
+  )
+}
+
+function OffprintList({
+  children,
+  ordered,
+  start,
+}: {
+  children: OffprintListItem[]
+  ordered: boolean
+  start?: number
+}) {
+  const className = ordered
+    ? 'list-decimal pl-6 text-900 flex flex-col gap-1 font-sans'
+    : 'list-disc pl-6 text-900 flex flex-col gap-1 font-sans'
+
+  const items = children.map((item, i) => (
+    <li key={i} className="leading-relaxed">
+      {renderRichText(item.content.plaintext, item.content.facets)}
+      {item.children?.length ? (
+        <OffprintList children={item.children} ordered={ordered} />
+      ) : null}
+    </li>
+  ))
+
+  return ordered ? (
+    <ol className={className} start={start}>
+      {items}
+    </ol>
+  ) : (
+    <ul className={className}>{items}</ul>
+  )
+}
+
+function OffprintTaskList({children}: {children: OffprintTaskItem[]}) {
+  return (
+    <ul className="pl-1 flex flex-col gap-1 font-sans text-900">
+      {children.map((item, i) => (
+        <li key={i} className="flex items-start gap-2 leading-relaxed">
+          <span className="mt-1 select-none">{item.checked ? '☑' : '☐'}</span>
+          <span>
+            {renderRichText(item.content.plaintext, item.content.facets)}
+          </span>
+        </li>
+      ))}
+    </ul>
+  )
+}
+
+function OffprintImage({block, did}: {block: OffprintImageBlock; did: string}) {
+  const blob = block.image ?? block.blob
+  if (!blob) return null
+  const src = cdnUrl(did, blob.ref.$link)
+
+  const caption = block.caption ?? block.alt
+
+  return (
+    <figure className="my-4 -mx-2 md:-mx-8">
+      <img
+        src={src}
+        alt={block.alt}
+        className="rounded-md shadow-2xl shadow-black/40 max-w-full mx-auto"
+      />
+      {caption ? (
+        <figcaption className="text-center text-xs font-mono uppercase tracking-wider text-500 mt-3">
+          {caption}
+        </figcaption>
+      ) : null}
+    </figure>
+  )
+}
+
+function OffprintCode({block}: {block: OffprintCodeBlock}) {
+  return (
+    <pre className="bg-50 text-900 py-4 px-5 rounded-md overflow-x-auto my-2 font-mono text-sm leading-relaxed border border-100">
+      {block.code}
+    </pre>
+  )
 }
 
 function Error() {

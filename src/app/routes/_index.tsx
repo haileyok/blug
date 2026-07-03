@@ -1,15 +1,29 @@
 import {json, MetaFunction} from '@remix-run/node'
 import {getPosts} from '../../atproto'
 import {useLoaderData} from '@remix-run/react'
-import {LeafletDocument} from 'src/types'
 
 export const loader = async () => {
   const posts = await getPosts(undefined)
   const postsShortened = posts.map(p => {
-    p.description = p.description?.slice(0, 180)
-    return p
+    // Leaflet posts carry a `description`; Offprint posts carry `textContent`.
+    // Normalize both into a short blurb for the listing.
+    const blurb =
+      ('description' in p ? p.description : p.textContent) ?? ''
+    return {
+      rkey: p.rkey,
+      title: p.title,
+      publishedAt: p.publishedAt,
+      description: blurb.slice(0, 180),
+    }
   })
   return json({posts: postsShortened})
+}
+
+export interface PostSummary {
+  rkey: string
+  title: any
+  publishedAt: string
+  description: string
 }
 
 export const meta: MetaFunction = () => {
@@ -24,7 +38,7 @@ export const meta: MetaFunction = () => {
 
 export default function Index() {
   const {posts} = useLoaderData<{
-    posts: LeafletDocument[]
+    posts: PostSummary[]
   }>()
 
   return (
@@ -61,7 +75,7 @@ export default function Index() {
   )
 }
 
-function PostItem({post}: {post: LeafletDocument}) {
+function PostItem({post}: {post: PostSummary}) {
   const date = new Date(post.publishedAt)
   return (
     <li>

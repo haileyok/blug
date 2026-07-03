@@ -169,3 +169,151 @@ export interface LeafletDocument {
   // not a part of the record, but we're going to stick it in
   rkey: string
 }
+
+// ---------------------------------------------------------------------------
+// Offprint (app.offprint.*) — block-based document format. Like Leaflet,
+// Offprint posts are stored as `site.standard.document` records, but their
+// content is `app.offprint.content` with a flat `items[]` array of blocks.
+// ---------------------------------------------------------------------------
+
+export type OffprintFacetFeature =
+  | {$type: 'app.offprint.richtext.facet#bold'}
+  | {$type: 'app.offprint.richtext.facet#italic'}
+  | {$type: 'app.offprint.richtext.facet#underline'}
+  | {$type: 'app.offprint.richtext.facet#strikethrough'}
+  | {$type: 'app.offprint.richtext.facet#code'}
+  | {$type: 'app.offprint.richtext.facet#highlight'; color?: string}
+  | {$type: 'app.offprint.richtext.facet#link'; uri: string}
+  | {$type: 'app.offprint.richtext.facet#mention'; did: string; handle?: string}
+
+export interface OffprintFacet {
+  features: OffprintFacetFeature[]
+  index: {
+    byteStart: number
+    byteEnd: number
+  }
+}
+
+export interface OffprintTextBlock {
+  $type: 'app.offprint.block.text'
+  plaintext: string
+  facets?: OffprintFacet[]
+  textAlign?: 'left' | 'center' | 'right' | 'justify'
+}
+
+export interface OffprintHeadingBlock {
+  $type: 'app.offprint.block.heading'
+  level: 1 | 2 | 3
+  plaintext: string
+  facets?: OffprintFacet[]
+  textAlign?: 'left' | 'center' | 'right'
+}
+
+export interface OffprintBlockquoteBlock {
+  $type: 'app.offprint.block.blockquote'
+  content: (OffprintTextBlock | OffprintHeadingBlock)[]
+}
+
+export interface OffprintCalloutBlock {
+  $type: 'app.offprint.block.callout'
+  plaintext: string
+  emoji?: string
+  color?: string
+  facets?: OffprintFacet[]
+}
+
+export interface OffprintListItem {
+  content: OffprintTextBlock
+  children?: OffprintListItem[]
+}
+
+export interface OffprintTaskItem {
+  checked: boolean
+  content: OffprintTextBlock
+  children?: OffprintTaskItem[]
+}
+
+export interface OffprintBulletListBlock {
+  $type: 'app.offprint.block.bulletList'
+  children: OffprintListItem[]
+}
+
+export interface OffprintOrderedListBlock {
+  $type: 'app.offprint.block.orderedList'
+  children: OffprintListItem[]
+  start?: number
+}
+
+export interface OffprintTaskListBlock {
+  $type: 'app.offprint.block.taskList'
+  children: OffprintTaskItem[]
+}
+
+export interface OffprintImageBlock {
+  $type: 'app.offprint.block.image'
+  // The real record uses `image`; the lexicon also documents a `blob` alias.
+  image?: Blob
+  blob?: Blob
+  alt?: string
+  caption?: string
+  alignment?: 'left' | 'center' | 'right'
+  aspectRatio?: AspectRatio
+  width?: string
+}
+
+export interface OffprintCodeBlock {
+  $type: 'app.offprint.block.codeBlock'
+  code: string
+  language?: string
+  showLineNumbers?: boolean
+}
+
+export interface OffprintBlueskyPostBlock {
+  $type: 'app.offprint.block.blueskyPost'
+  post: {
+    uri: string
+    cid: string
+  }
+}
+
+export interface OffprintHorizontalRuleBlock {
+  $type: 'app.offprint.block.horizontalRule'
+}
+
+export type OffprintBlock =
+  | OffprintTextBlock
+  | OffprintHeadingBlock
+  | OffprintBlockquoteBlock
+  | OffprintCalloutBlock
+  | OffprintBulletListBlock
+  | OffprintOrderedListBlock
+  | OffprintTaskListBlock
+  | OffprintImageBlock
+  | OffprintCodeBlock
+  | OffprintBlueskyPostBlock
+  | OffprintHorizontalRuleBlock
+
+export interface OffprintContent {
+  $type: 'app.offprint.content'
+  items: OffprintBlock[]
+}
+
+export interface OffprintDocument {
+  $type: 'site.standard.document'
+  title: string
+  publishedAt: string
+  content: OffprintContent
+  path?: string
+  site?: string
+  textContent?: string
+  rkey: string
+}
+
+/** A post record from the `site.standard.document` collection — Leaflet or Offprint. */
+export type Document = LeafletDocument | OffprintDocument
+
+export function isOffprintDocument(
+  doc: Document,
+): doc is OffprintDocument {
+  return (doc.content as OffprintContent)?.$type === 'app.offprint.content'
+}

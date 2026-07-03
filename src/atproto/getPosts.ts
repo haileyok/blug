@@ -1,6 +1,6 @@
 import {ATP_AGENT} from './agent.js'
 import {getCachedPosts, setCachedPosts} from '../redis/redis.js'
-import {LeafletDocument} from 'src/types.js'
+import {Document} from 'src/types.js'
 
 export const getPosts = async (
   cursor: string | undefined,
@@ -23,7 +23,7 @@ export const getPosts = async (
   }
 
   const posts = res.data.records.map(data => {
-    const post = data.value as LeafletDocument
+    const post = data.value as Document
     const uriPts = data.uri.split('/')
     post.rkey = uriPts[uriPts.length - 1]
     return post
