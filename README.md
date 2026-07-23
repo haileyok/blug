@@ -68,6 +68,34 @@ yarn run dev
 
 ## Deployment
 
+### Docker (recommended)
+
+The easiest way to run Blug is with Docker Compose, which spins up both the app
+and a Redis cache together.
+
+1. Copy the example env file and fill in your ATProtocol values:
+
+   ```shell
+   cp .env.example .env
+   # edit .env with your ATP_SERVICE, ATP_IDENTIFIER, and ATP_DID
+   ```
+
+2. Build and start everything:
+
+   ```shell
+   docker compose up -d --build
+   ```
+
+The app will be available at `http://localhost:3000`.
+
+To stop:
+
+```shell
+docker compose down
+```
+
+### Manual
+
 Make sure you have `dotenv-cli` installed.
 
 ```shell
@@ -80,3 +108,11 @@ Then build and serve.
 yarn build
 yarn start
 ```
+
+## CI/CD
+
+On every push to `main`, a GitHub Actions workflow builds the Docker image and
+publishes it to the GitHub Container Registry at
+`ghcr.io/haileyok/blug`. The image is tagged with both `latest` and the commit
+SHA. No additional secrets are required — the workflow uses the built-in
+`GITHUB_TOKEN` with `packages:write` permission.
