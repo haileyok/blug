@@ -2,10 +2,9 @@ import Redis from 'ioredis'
 import {AppBskyActorDefs} from '@atproto/api'
 import {Document} from '../types'
 
-export const REDIS_CLIENT = new Redis({
-  port: 6379,
-  host: '127.0.0.1',
-})
+export const REDIS_CLIENT = new Redis(
+  process.env.REDIS_URL || 'redis://127.0.0.1:6379',
+)
 
 export const getCachedPosts = async () => {
   const res = await REDIS_CLIENT.get('posts')

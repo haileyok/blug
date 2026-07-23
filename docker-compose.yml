@@ -1,0 +1,31 @@
+services:
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    # Persist data across restarts so the cache survives container rebuilds.
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  app:
+    build: .
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    depends_on:
+      redis:
+        condition: service_healthy
+    environment:
+      # Redis is reachable at the `redis` service hostname on the default port.
+      REDIS_URL: redis://redis:6379
+      # ATProtocol config — provide these in a .env file next to docker-compose.yml.
+      ATP_SERVICE: ${ATP_SERVICE}
+      ATP_IDENTIFIER: ${ATP_IDENTIFIER}
+      ATP_DID: ${ATP_DID}
+
+volumes:
+  redis-data:
