@@ -50,7 +50,11 @@ export const getPublication = async () => {
     // fall through to listing the collection
   }
 
-  // Fall back to the first record in the collection.
+  // Fall back to listing the collection. This is discovery for the
+  // unconfigured case: with no ATP_PUBLICATION_RKEY, the first record wins.
+  // When an explicit rkey IS configured, a transient getRecord failure must
+  // not silently substitute an unrelated record — accept only the configured
+  // one and throw otherwise.
   const res = await ATP_AGENT.com.atproto.repo.listRecords({
     collection: 'site.standard.publication',
     repo,
@@ -59,10 +63,16 @@ export const getPublication = async () => {
     throw new Error('Failed to get publication record.')
   }
 
-  const first = res.data.records[0]
+  const records = res.data.records
+  const explicitRkey = process.env.ATP_PUBLICATION_RKEY
+  const first = explicitRkey
+    ? records.find(r => r.uri.endsWith('/' + explicitRkey))
+    : records[0]
   if (!first) {
     throw new Error(
-      'No site.standard.publication record found. Create one on your PDS (rkey "self" is the convention) so this blog can verify against standard.site.',
+      explicitRkey
+        ? `No site.standard.publication record with rkey "${explicitRkey}" found in ${repo}'s repo.`
+        : 'No site.standard.publication record found. Create one on your PDS (rkey "self" is the convention) so this blog can verify against standard.site.',
     )
   }
 

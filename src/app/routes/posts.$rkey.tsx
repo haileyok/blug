@@ -79,7 +79,14 @@ function postDescription(post: Document): string | undefined {
   return 'description' in post ? post.description : post.textContent
 }
 
-export const meta: MetaFunction<typeof loader> = ({data, params}) => {
+export const meta: MetaFunction<typeof loader> = ({data, params, matches}) => {
+  // Spread the parent (root) meta so the site.standard.publication link
+  // tag survives on this leaf route — leaf meta replaces parent meta
+  // unless it re-includes it.
+  const parentMeta = matches
+    .flatMap(m => m.meta ?? [])
+    .filter(m => 'tagName' in m && m.tagName === 'link')
+
   const post = data ? (data.post as unknown as Document) : undefined
   const {postText, ogImageUrl} =
     data && post
@@ -107,6 +114,7 @@ export const meta: MetaFunction<typeof loader> = ({data, params}) => {
       : []
 
   return [
+    ...parentMeta,
     {title: `${data?.post.title} | Hailey's Cool Site`},
     {
       name: 'description',

@@ -54,6 +54,11 @@ function section(name: string) {
   console.log(`\n── ${name} ${'─'.repeat(Math.max(0, 60 - name.length))}`)
 }
 
+/** Escape a string for safe interpolation into a RegExp (DIDs, rkeys). */
+function reEscape(s: string): string {
+  return s.replaceAll(/[.*+?^${}()|[\]\\]/g, '\\$&')
+}
+
 /**
  * Fetch a listRecords endpoint, following cursors so every record in the
  * collection is returned (not just the first page).
@@ -252,17 +257,16 @@ async function main() {
         continue
       }
       const html = await res.text()
-      const docTag = new RegExp(
-        `<link[^>]*rel="site\\.standard\\.document"[^>]*href="at://${ATP_DID.replaceAll(
-          /[^a-z0-9]/gi,
-          '\\$&',
-        )}/site\\.standard\\.document/${rkey}"[^>]*>`,
-      ).test(html) ||
+      const docTag =
         new RegExp(
-          `<link[^>]*href="at://${ATP_DID.replaceAll(
-            /[^a-z0-9]/gi,
-            '\\$&',
-          )}/site\\.standard\\.document/${rkey}"[^>]*rel="site\\.standard\\.document"[^>]*>`,
+          `<link[^>]*rel="site\\.standard\\.document"[^>]*href="at://${reEscape(
+            ATP_DID,
+          )}/site\\.standard\\.document/${reEscape(rkey)}"[^>]*>`,
+        ).test(html) ||
+        new RegExp(
+          `<link[^>]*href="at://${reEscape(
+            ATP_DID,
+          )}/site\\.standard\\.document/${reEscape(rkey)}"[^>]*rel="site\\.standard\\.document"[^>]*>`,
         ).test(html)
       const pubTag = /<link[^>]+rel="site\.standard\.publication"[^>]*>/.exec(
         html,

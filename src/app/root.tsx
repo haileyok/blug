@@ -9,7 +9,7 @@ import {
   useLocation,
   useRouteError,
 } from '@remix-run/react'
-import {json, LinksFunction} from '@remix-run/node'
+import {json, LinksFunction, MetaFunction} from '@remix-run/node'
 import styles from './tailwind.css?url'
 import {getProfile, getPublication} from 'src/atproto'
 import {AppBskyActorDefs} from '@atproto/api'
@@ -26,20 +26,33 @@ export const links: LinksFunction = () => [
     href: 'https://fonts.googleapis.com/css2?family=Recursive:slnt,wght,CASL,MONO@-15..0,300..900,0..1,0..1&display=swap',
     rel: 'stylesheet',
   },
-  // standard.site discovery hint — points at this blog's publication record.
-  // The AT-URI is static (rkey "self" convention / ATP_PUBLICATION_RKEY), so
-  // this can live in `links` rather than per-route meta.
-  {
-    rel: 'site.standard.publication',
-    href: `at://${process.env.ATP_DID}/site.standard.publication/${
-      process.env.ATP_PUBLICATION_RKEY || 'self'
-    }`,
-  },
 ]
 
 export const loader = async () => {
-  const profile = await getProfile()
-  return json({profile})
+  const [profile, publication] = await Promise.all([
+    getProfile(),
+    // Resolve the actual publication record so the discovery link tag
+    // advertises the discovered rkey, not a hard-coded guess. A PDS outage
+    // must not take the site down — fall back to the configured/default
+    // rkey for the tag.
+    getPublication().catch(() => null),
+  ])
+  return json({profile, publication})
+}
+
+export const meta: MetaFunction<typeof loader> = ({data}) => {
+  const did = process.env.ATP_DID
+  const rkey =
+    data?.publication?.rkey || process.env.ATP_PUBLICATION_RKEY || 'self'
+  return did
+    ? [
+        {
+          tagName: 'link',
+          rel: 'site.standard.publication',
+          href: `at://${did}/site.standard.publication/${rkey}`,
+        },
+      ]
+    : []
 }
 
 export function Layout({children}: {children: React.ReactNode}) {
