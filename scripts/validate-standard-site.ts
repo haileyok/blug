@@ -268,19 +268,26 @@ async function main() {
         continue
       }
       const html = await res.text()
-      const docTag =
+      // Both tags must exist AND point at the exact expected AT-URIs —
+      // the right rel with a foreign href must fail.
+      const expectedDocHref = `at://${reEscape(
+        ATP_DID,
+      )}/site\\.standard\\.document/${reEscape(rkey)}`
+      const expectedPubHref = reEscape(publicationUri || '')
+      const tagMatcher = (rel: string, href: string) =>
         new RegExp(
-          `<link[^>]*rel="site\\.standard\\.document"[^>]*href="at://${reEscape(
-            ATP_DID,
-          )}/site\\.standard\\.document/${reEscape(rkey)}"[^>]*>`,
+          `<link[^>]*rel="${rel}"[^>]*href="${href}"[^>]*>`,
         ).test(html) ||
         new RegExp(
-          `<link[^>]*href="at://${reEscape(
-            ATP_DID,
-          )}/site\\.standard\\.document/${reEscape(rkey)}"[^>]*rel="site\\.standard\\.document"[^>]*>`,
+          `<link[^>]*href="${href}"[^>]*rel="${rel}"[^>]*>`,
         ).test(html)
-      const pubTag = /<link[^>]+rel="site\.standard\.publication"[^>]*>/.exec(
-        html,
+      const docTag = tagMatcher(
+        'site\\.standard\\.document',
+        expectedDocHref,
+      )
+      const pubTag = tagMatcher(
+        'site\\.standard\\.publication',
+        expectedPubHref,
       )
       if (docTag) {
         ok(`/posts/${rkey} has its site.standard.document link tag`)

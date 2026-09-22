@@ -465,6 +465,27 @@ function Image({block, did}: {block: LeafletImageBlock; did: string}) {
 }
 
 function Website({block, did}: {block: LeafletWebsiteBlock; did: string}) {
+  // A record's src is untrusted input: only http(s) URLs may become a
+  // clickable href, otherwise a javascript: (or other scheme) value in a
+  // published record would execute on click.
+  let safeSrc: string | null = null
+  try {
+    const parsed = new URL(block.src)
+    safeSrc =
+      parsed.protocol === 'http:' || parsed.protocol === 'https:'
+        ? parsed.toString()
+        : null
+  } catch {
+    safeSrc = null
+  }
+
+  if (!safeSrc) {
+    return (
+      <p className="text-400 mt-2 font-mono text-xs uppercase tracking-wider">
+        [unrenderable link: {block.src}]
+      </p>
+    )
+  }
   function PreviewImage() {
     if (!block.previewImage) {
       return null
@@ -482,11 +503,11 @@ function Website({block, did}: {block: LeafletWebsiteBlock; did: string}) {
 
   return (
     <a
-      href={block.src}
+      href={safeSrc}
       className="border border-100 rounded-md flex gap-4 p-4 bg-50 hover:bg-100 hover:border-300 transition-colors group my-2">
       <div className="flex-1 min-w-0">
         <h3 className="font-display text-lg md:text-xl text-950 truncate group-hover:text-600 transition-colors">
-          {block.title || block.src}
+          {block.title || safeSrc}
         </h3>
         {block.description ? (
           <p className="text-500 mt-1 line-clamp-2 font-sans text-sm">
@@ -494,13 +515,7 @@ function Website({block, did}: {block: LeafletWebsiteBlock; did: string}) {
           </p>
         ) : null}
         <p className="text-400 mt-2 font-mono text-xs uppercase tracking-wider truncate">
-          {(() => {
-            try {
-              return new URL(block.src).hostname.replace(/^www\./, '')
-            } catch {
-              return block.src
-            }
-          })()}
+          {new URL(safeSrc).hostname.replace(/^www\./, '')}
         </p>
       </div>
       <PreviewImage />

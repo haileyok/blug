@@ -90,6 +90,13 @@ export const getPublication = async () => {
 
   const publication = first.value as Publication
   publication.rkey = first.uri.split('/').pop()!
-  await setCachedPublication(cacheKey, publication)
+  // Cache under the record's ACTUAL rkey (from its URI), not the requested/
+  // default one — discovery may find a record whose rkey differs from the
+  // configured guess, and caching it under the guess would mask the real
+  // record for that key.
+  await setCachedPublication(
+    `publication:${repo}:${publication.rkey}`,
+    publication,
+  )
   return publication
 }
