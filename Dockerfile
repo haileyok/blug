@@ -1,7 +1,8 @@
 # syntax=docker/dockerfile:1
 
 # ---- Build stage ----
-FROM node:18-alpine AS build
+# Node 22 required: vite 7 (v7.3.5) needs node ^20.19.0 || >=22.12.0.
+FROM node:22-alpine AS build
 
 WORKDIR /app
 
@@ -18,7 +19,9 @@ COPY . .
 RUN yarn exec remix vite:build
 
 # ---- Runtime stage ----
-FROM node:18-alpine AS runtime
+# Keep in sync with the build stage — vite 7's engine floor applies here too
+# because yarn install runs in this stage.
+FROM node:22-alpine AS runtime
 
 WORKDIR /app
 
