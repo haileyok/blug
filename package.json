@@ -12,9 +12,9 @@
   },
   "dependencies": {
     "@atproto/api": "^0.12.2",
-    "@remix-run/node": "^2.8.1",
+    "@remix-run/node": "^2.17.5",
     "@remix-run/react": "^2.8.1",
-    "@remix-run/serve": "^2.8.1",
+    "@remix-run/serve": "^2.17.5",
     "ioredis": "^5.3.2",
     "isbot": "^4.1.0",
     "react": "^18.2.0",
@@ -24,7 +24,7 @@
   "devDependencies": {
     "@eslint/eslintrc": "^3.0.2",
     "@eslint/js": "^9.0.0",
-    "@remix-run/dev": "^2.8.1",
+    "@remix-run/dev": "^2.17.5",
     "@types/react": "^18.2.20",
     "@types/react-dom": "^18.2.7",
     "@typescript-eslint/eslint-plugin": "^6.7.4",
