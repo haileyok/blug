@@ -54,12 +54,27 @@ function section(name: string) {
   console.log(`\n── ${name} ${'─'.repeat(Math.max(0, 60 - name.length))}`)
 }
 
-async function pds(path: string): Promise<any> {
-  const res = await fetch(`${ATP_SERVICE}/xrpc/${path}`)
-  if (!res.ok) {
-    throw new Error(`PDS ${path} -> ${res.status}`)
-  }
-  return res.json()
+/**
+ * Fetch a listRecords endpoint, following cursors so every record in the
+ * collection is returned (not just the first page).
+ */
+async function pdsList(path: string): Promise<any[]> {
+  const records: any[] = []
+  let cursor: string | undefined
+  do {
+    const separator = path.includes('?') ? '&' : '?'
+    const url = `${ATP_SERVICE}/xrpc/${path}${separator}limit=100${
+      cursor ? `&cursor=${encodeURIComponent(cursor)}` : ''
+    }`
+    const res = await fetch(url)
+    if (!res.ok) {
+      throw new Error(`PDS ${path} -> ${res.status}`)
+    }
+    const page = await res.json()
+    records.push(...(page.records || []))
+    cursor = page.cursor || undefined
+  } while (cursor)
+  return records
 }
 
 async function main() {
@@ -111,12 +126,11 @@ async function main() {
   section('2. site.standard.publication record')
   let publication: any
   try {
-    const data = await pds(
+    const records = await pdsList(
       `com.atproto.repo.listRecords?repo=${encodeURIComponent(
         ATP_IDENTIFIER,
       )}&collection=site.standard.publication`,
     )
-    const records: any[] = data.records || []
     const byRkey = records.find(
       r => r.uri === expectedPublicationUri || r.uri.endsWith('/' + PUBLICATION_RKEY),
     )
@@ -132,6 +146,11 @@ async function main() {
       }
       const value = publication.value || {}
       if (typeof value.url === 'string' && value.url.length > 0) {
+        if (/\/+$/.test(value.url)) {
+          warn(
+            `publication url "${value.url}" has a trailing slash — standard.site recommends against it`,
+          )
+        }
         const trimmed = value.url.replace(/\/+$/, '')
         if (trimmed === BASE_URL) {
           ok(`publication url "${value.url}" matches BASE_URL`)
@@ -161,12 +180,11 @@ async function main() {
   section('3. site.standard.document records')
   let docs: any[] = []
   try {
-    const data = await pds(
+    docs = await pdsList(
       `com.atproto.repo.listRecords?repo=${encodeURIComponent(
         ATP_IDENTIFIER,
-      )}&collection=site.standard.document&limit=100`,
+      )}&collection=site.standard.document`,
     )
-    docs = data.records || []
     if (docs.length === 0) {
       fail('no site.standard.document records found')
     } else {

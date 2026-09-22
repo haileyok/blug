@@ -32,6 +32,10 @@ export const getPublication = async () => {
     })
     if (res.success) {
       const publication = res.data.value as Publication
+      // Attach the rkey on the happy path too (the well-known route and any
+      // future consumer reads it); the fallback path below already does this.
+      publication.rkey =
+        process.env.ATP_PUBLICATION_RKEY || DEFAULT_PUBLICATION_RKEY
       await setCachedPublication(publication)
       return publication
     }
