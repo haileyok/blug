@@ -9,7 +9,8 @@
     "lint": "eslint --ignore-path .gitignore --cache --cache-location ./node_modules/.cache/eslint .",
     "start": "dotenv -e .env remix-serve ./build/server/index.js",
     "typecheck": "tsc",
-    "validate:standard-site": "dotenv -e .env tsx scripts/validate-standard-site.ts"
+    "validate:standard-site": "dotenv -e .env tsx scripts/validate-standard-site.ts",
+    "fix-document-site": "dotenv -e .env tsx scripts/fix-document-site.ts"
   },
   "dependencies": {
     "@atproto/api": "^0.12.2",
