@@ -38,17 +38,20 @@ export const getCachedProfile = async () => {
   return JSON.parse(res) as AppBskyActorDefs.ProfileViewDetailed
 }
 
-export const getCachedPublication = async () => {
-  const res = await REDIS_CLIENT.get('publication')
+export const getCachedPublication = async (cacheKey: string) => {
+  const res = await REDIS_CLIENT.get(cacheKey)
   if (!res) {
     return null
   }
   return JSON.parse(res) as Publication
 }
 
-export const setCachedPublication = async (publication: Publication) => {
+export const setCachedPublication = async (
+  cacheKey: string,
+  publication: Publication,
+) => {
   await REDIS_CLIENT.set(
-    'publication',
+    cacheKey,
     JSON.stringify(publication),
     'EX',
     60 * 10,

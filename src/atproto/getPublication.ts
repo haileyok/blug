@@ -16,12 +16,20 @@ const DEFAULT_PUBLICATION_RKEY = 'self'
  * different rkey.
  */
 export const getPublication = async () => {
-  const cachedPublication = await getCachedPublication()
+  const repo = process.env.ATP_DID
+  if (!repo) {
+    throw new Error('ATP_DID is not configured')
+  }
+  const configuredRkey =
+    process.env.ATP_PUBLICATION_RKEY || DEFAULT_PUBLICATION_RKEY
+
+  // Scope the cache key by repo + rkey so a stale entry from a prior
+  // configuration can never be served as authoritative for this one.
+  const cacheKey = `publication:${repo}:${configuredRkey}`
+  const cachedPublication = await getCachedPublication(cacheKey)
   if (cachedPublication) {
     return cachedPublication
   }
-
-  const repo = process.env.ATP_DID!
 
   // Try the conventional rkey first.
   try {
@@ -34,9 +42,8 @@ export const getPublication = async () => {
       const publication = res.data.value as Publication
       // Attach the rkey on the happy path too (the well-known route and any
       // future consumer reads it); the fallback path below already does this.
-      publication.rkey =
-        process.env.ATP_PUBLICATION_RKEY || DEFAULT_PUBLICATION_RKEY
-      await setCachedPublication(publication)
+      publication.rkey = configuredRkey
+      await setCachedPublication(cacheKey, publication)
       return publication
     }
   } catch {
@@ -61,6 +68,6 @@ export const getPublication = async () => {
 
   const publication = first.value as Publication
   publication.rkey = first.uri.split('/').pop()!
-  await setCachedPublication(publication)
+  await setCachedPublication(cacheKey, publication)
   return publication
 }

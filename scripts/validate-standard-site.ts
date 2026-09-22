@@ -100,7 +100,7 @@ async function main() {
       if (contentType.startsWith('text/plain')) {
         ok(`responds 200 text/plain`)
       } else {
-        warn(`content-type is "${contentType}", expected text/plain`)
+        fail(`content-type is "${contentType}", expected text/plain`)
       }
       if (/^at:\/\/[^\s]+$/.test(text)) {
         ok(`returns an AT-URI: ${text}`)
@@ -131,10 +131,15 @@ async function main() {
         ATP_IDENTIFIER,
       )}&collection=site.standard.publication`,
     )
+    // Only the record matching the configured/advertised rkey is canonical.
+    // A silent records[0] fallback could validate an unrelated publication
+    // and report PASS for a broken handshake.
     const byRkey = records.find(
-      r => r.uri === expectedPublicationUri || r.uri.endsWith('/' + PUBLICATION_RKEY),
+      r =>
+        r.uri === expectedPublicationUri ||
+        r.uri.endsWith('/' + PUBLICATION_RKEY),
     )
-    publication = byRkey ?? records[0]
+    publication = byRkey
     if (publication) {
       ok(`found publication record ${publication.uri}`)
       if (wellKnownUri && wellKnownUri !== publication.uri) {
@@ -199,9 +204,16 @@ async function main() {
     const rkey = doc.uri.split('/').pop()
     const v = doc.value || {}
     const problems: string[] = []
-    if (!v.site) problems.push('missing required "site"')
-    if (!v.title) problems.push('missing required "title"')
-    if (!v.publishedAt) problems.push('missing required "publishedAt"')
+    if (typeof v.site !== 'string' || v.site.length === 0)
+      problems.push('missing or invalid required "site"')
+    if (typeof v.title !== 'string' || v.title.length === 0)
+      problems.push('missing or invalid required "title"')
+    if (typeof v.publishedAt !== 'string' || v.publishedAt.length === 0)
+      problems.push('missing or invalid required "publishedAt"')
+    // The lexicon makes path optional, but this blog's routing requires it:
+    // /posts/{rkey} must be advertised by the record's path. Enforce it.
+    if (typeof v.path !== 'string' || v.path.length === 0)
+      problems.push('missing required "path" (this blog routes on it)')
     if (typeof v.title === 'string' && v.title.length > 5000)
       problems.push('title exceeds maxLength 5000')
     if (
