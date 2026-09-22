@@ -132,6 +132,13 @@ async function main() {
 
   // --- 2. publication record ----------------------------------------------
   section('2. site.standard.publication record')
+  // With an explicitly configured rkey, the exact AT-URI is the expectation.
+  // Unconfigured, the well-known endpoint's advertised AT-URI identifies the
+  // record (matching the app's first-record discovery) — otherwise valid
+  // non-"self" publications would fail validation.
+  const expectedUri = process.env.ATP_PUBLICATION_RKEY
+    ? expectedPublicationUri
+    : wellKnownUri || expectedPublicationUri
   let publication: any
   try {
     const records = await pdsList(
@@ -139,10 +146,10 @@ async function main() {
         ATP_IDENTIFIER,
       )}&collection=site.standard.publication`,
     )
-    // Only the record matching the configured/advertised rkey is canonical.
+    // Only the record matching the expected AT-URI is canonical.
     // Exact AT-URI match only — suffix matching could accept a record from
     // a different repo/DID.
-    const byRkey = records.find(r => r.uri === expectedPublicationUri)
+    const byRkey = records.find(r => r.uri === expectedUri)
     publication = byRkey
     if (publication) {
       ok(`found publication record ${publication.uri}`)
@@ -154,6 +161,9 @@ async function main() {
         ok(`well-known AT-URI matches the record URI`)
       }
       const value = publication.value || {}
+      if (value.$type !== 'site.standard.publication') {
+        fail('publication record $type must be "site.standard.publication"')
+      }
       if (typeof value.url === 'string' && value.url.length > 0) {
         if (/\/+$/.test(value.url)) {
           warn(
@@ -208,6 +218,8 @@ async function main() {
     const rkey = doc.uri.split('/').pop()
     const v = doc.value || {}
     const problems: string[] = []
+    if (v.$type !== 'site.standard.document')
+      problems.push(`record $type must be "site.standard.document"`)
     if (typeof v.site !== 'string' || v.site.length === 0)
       problems.push('missing or invalid required "site"')
     if (typeof v.title !== 'string' || v.title.length === 0)
