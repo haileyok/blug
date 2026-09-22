@@ -54,20 +54,32 @@ export const getPublication = async () => {
   // unconfigured case: with no ATP_PUBLICATION_RKEY, the first record wins.
   // When an explicit rkey IS configured, a transient getRecord failure must
   // not silently substitute an unrelated record — accept only the configured
-  // one and throw otherwise.
-  const res = await ATP_AGENT.com.atproto.repo.listRecords({
-    collection: 'site.standard.publication',
-    repo,
-  })
-  if (!res.success) {
-    throw new Error('Failed to get publication record.')
-  }
-
-  const records = res.data.records
+  // one and throw otherwise. listRecords is cursor-paginated, so follow the
+  // cursor until the record is found or the collection is exhausted.
   const explicitRkey = process.env.ATP_PUBLICATION_RKEY
-  const first = explicitRkey
-    ? records.find(r => r.uri.endsWith('/' + explicitRkey))
-    : records[0]
+  let first: {uri: string; cid: string; value: unknown} | undefined
+  let cursor: string | undefined
+  do {
+    const res = await ATP_AGENT.com.atproto.repo.listRecords({
+      collection: 'site.standard.publication',
+      repo,
+      cursor,
+    })
+    if (!res.success) {
+      throw new Error('Failed to get publication record.')
+    }
+
+    const records = res.data.records
+    const match = explicitRkey
+      ? records.find(r => r.uri.endsWith('/' + explicitRkey))
+      : records[0]
+    if (match) {
+      first = match as {uri: string; cid: string; value: unknown}
+      break
+    }
+    cursor = res.data.cursor || undefined
+  } while (cursor)
+
   if (!first) {
     throw new Error(
       explicitRkey

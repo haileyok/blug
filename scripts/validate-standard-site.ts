@@ -290,7 +290,7 @@ async function main() {
       if (pubTag) {
         ok(`/posts/${rkey} has a site.standard.publication link tag`)
       } else {
-        warn(`/posts/${rkey} is missing a site.standard.publication link tag`)
+        fail(`/posts/${rkey} is missing a site.standard.publication link tag`)
       }
     } catch (e: any) {
       fail(`could not fetch /posts/${rkey}: ${e.message}`)
