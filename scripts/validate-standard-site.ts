@@ -211,9 +211,15 @@ async function main() {
     if (typeof v.publishedAt !== 'string' || v.publishedAt.length === 0)
       problems.push('missing or invalid required "publishedAt"')
     // The lexicon makes path optional, but this blog's routing requires it:
-    // /posts/{rkey} must be advertised by the record's path. Enforce it.
-    if (typeof v.path !== 'string' || v.path.length === 0)
+    // documents are served at /posts/{rkey} and the record must advertise
+    // exactly that canonical path.
+    if (typeof v.path !== 'string' || v.path.length === 0) {
       problems.push('missing required "path" (this blog routes on it)')
+    } else if (v.path !== `/posts/${rkey}`) {
+      problems.push(
+        `path "${v.path}" does not match this blog's route /posts/${rkey}`,
+      )
+    }
     if (typeof v.title === 'string' && v.title.length > 5000)
       problems.push('title exceeds maxLength 5000')
     if (
@@ -237,7 +243,7 @@ async function main() {
 
   // --- 4. document link tags on the blog -----------------------------------
   section('4. site.standard.document link tags')
-  for (const doc of docs.slice(0, 10)) {
+  for (const doc of docs) {
     const rkey = doc.uri.split('/').pop()
     try {
       const res = await fetch(`${BASE_URL}/posts/${rkey}`)

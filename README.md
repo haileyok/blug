@@ -21,7 +21,8 @@ standard.site-compatible client you use (Leaflet, Offprint, pckt.blog, or
 1. A `site.standard.publication` record (rkey `self` is the convention) with
    `url` set to your blog's origin — e.g. `https://your.blog`, **no trailing slash**.
 2. `site.standard.document` records with required fields `site`, `title`,
-   `publishedAt`, and `path` like `/posts/{rkey}` pointing at this blog's routes.
+   `publishedAt`, and `path` set to exactly `/posts/{rkey}` — the canonical
+   route this blog serves each document at.
 
 Once the blog is running, validate the whole handshake end-to-end:
 
