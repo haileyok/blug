@@ -220,8 +220,21 @@ async function main() {
     const problems: string[] = []
     if (v.$type !== 'site.standard.document')
       problems.push(`record $type must be "site.standard.document"`)
-    if (typeof v.site !== 'string' || v.site.length === 0)
+    if (typeof v.site !== 'string' || v.site.length === 0) {
       problems.push('missing or invalid required "site"')
+    } else if (!v.site.startsWith('at://')) {
+      // The lexicon allows an https publication url for "loose documents",
+      // but this blog validates full publication association — a viewer URL
+      // like https://leaflet.pub/p/... marks the document as loose and
+      // fails standard.site conformance checkers.
+      problems.push(
+        `site "${v.site}" is not an AT-URI — documents must point at their publication record (at://{did}/site.standard.publication/{rkey}). Run "yarn fix-document-site" to rewrite.`,
+      )
+    } else if (!/^at:\/\/did:[a-z0-9:]+\/[a-z.]+\/[a-zA-Z0-9._-]+$/.test(v.site)) {
+      problems.push(
+        `site "${v.site}" is not a well-formed AT-URI (at://{did}/{collection}/{rkey})`,
+      )
+    }
     if (typeof v.title !== 'string' || v.title.length === 0)
       problems.push('missing or invalid required "title"')
     if (typeof v.publishedAt !== 'string' || v.publishedAt.length === 0)

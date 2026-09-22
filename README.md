@@ -35,6 +35,28 @@ document record against the lexicon's required fields, and the link tags
 rendered on the post pages. It exits non-zero on any failure. Set `BASE_URL`
 to validate a deployed instance.
 
+### Fixing records written by other clients
+
+Some clients (Leaflet, for example) write the document's `site` field as
+their own viewer URL (`https://leaflet.pub/p/...`) instead of an at:// URI
+to your publication record. The lexicon allows that for "loose documents,"
+but documents that belong to a publication must point at its record —
+`at://{DID}/site.standard.publication/{rkey}` — or conformance checkers
+will reject them.
+
+To rewrite those records (an upsert per record, preserving every other
+field):
+
+```shell
+yarn fix-document-site                 # dry run: reports what would change
+FIX_WRITE=1 yarn fix-document-site     # rewrites the records (needs ATP_AUTH_PASSWORD)
+```
+
+`FIX_WRITE=1` (or passing `--write` directly to the script with tsx) applies
+the rewrites. It requires a PDS app password in `ATP_AUTH_PASSWORD` (see
+`.env.example`) and uses swap-record guards so a record that changed mid-run
+fails loudly instead of being overwritten.
+
 ## Leaflet Support
 
 This blog now uses [Leaflet](https://leaflet.pub), a block-based document format for ATProtocol. Instead of simple markdown content, posts are composed of structured blocks that support rich formatting and embedded content.
