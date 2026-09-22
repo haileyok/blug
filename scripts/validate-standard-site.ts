@@ -102,7 +102,10 @@ async function main() {
     if (res.status === 200) {
       const text = (await res.text()).trim()
       const contentType = res.headers.get('content-type') || ''
-      if (contentType.startsWith('text/plain')) {
+      // Parse the media type exactly: prefix matching would accept
+      // "text/plain-malicious" or "text/plainfoo".
+      const mediaType = contentType.split(';')[0].trim().toLowerCase()
+      if (mediaType === 'text/plain') {
         ok(`responds 200 text/plain`)
       } else {
         fail(`content-type is "${contentType}", expected text/plain`)
@@ -137,13 +140,9 @@ async function main() {
       )}&collection=site.standard.publication`,
     )
     // Only the record matching the configured/advertised rkey is canonical.
-    // A silent records[0] fallback could validate an unrelated publication
-    // and report PASS for a broken handshake.
-    const byRkey = records.find(
-      r =>
-        r.uri === expectedPublicationUri ||
-        r.uri.endsWith('/' + PUBLICATION_RKEY),
-    )
+    // Exact AT-URI match only — suffix matching could accept a record from
+    // a different repo/DID.
+    const byRkey = records.find(r => r.uri === expectedPublicationUri)
     publication = byRkey
     if (publication) {
       ok(`found publication record ${publication.uri}`)
@@ -237,8 +236,20 @@ async function main() {
     }
     if (v.path && !String(v.path).startsWith('/'))
       problems.push(`path "${v.path}" should start with a leading slash`)
-    if (v.content && !v.content.$type)
-      problems.push('content union entry is missing $type')
+    // The content union is required by this blog's renderers: it must be an
+    // object with a string $type discriminator.
+    if (
+      typeof v.content !== 'object' ||
+      v.content === null ||
+      Array.isArray(v.content)
+    ) {
+      problems.push('missing or invalid required "content" (must be an object)')
+    } else if (
+      typeof v.content.$type !== 'string' ||
+      v.content.$type.length === 0
+    ) {
+      problems.push('content union entry is missing a string $type')
+    }
     if (problems.length === 0) {
       ok(`${rkey}: "${v.title}"`)
     } else {

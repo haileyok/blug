@@ -132,7 +132,7 @@ export const meta: MetaFunction<typeof loader> = ({data, params, matches}) => {
       content: 'article',
     },
     {
-      property: 'og:published_time',
+      property: 'article:published_time',
       content: post?.publishedAt,
     },
     {
