@@ -11,7 +11,7 @@ import {
 } from '@remix-run/react'
 import {json, LinksFunction} from '@remix-run/node'
 import styles from './tailwind.css?url'
-import {getProfile} from 'src/atproto'
+import {getProfile, getPublication} from 'src/atproto'
 import {AppBskyActorDefs} from '@atproto/api'
 
 export const links: LinksFunction = () => [
@@ -25,6 +25,15 @@ export const links: LinksFunction = () => [
   {
     href: 'https://fonts.googleapis.com/css2?family=Recursive:slnt,wght,CASL,MONO@-15..0,300..900,0..1,0..1&display=swap',
     rel: 'stylesheet',
+  },
+  // standard.site discovery hint — points at this blog's publication record.
+  // The AT-URI is static (rkey "self" convention / ATP_PUBLICATION_RKEY), so
+  // this can live in `links` rather than per-route meta.
+  {
+    rel: 'site.standard.publication',
+    href: `at://${process.env.ATP_DID}/site.standard.publication/${
+      process.env.ATP_PUBLICATION_RKEY || 'self'
+    }`,
   },
 ]
 

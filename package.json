@@ -8,7 +8,8 @@
     "dev": "remix vite:dev",
     "lint": "eslint --ignore-path .gitignore --cache --cache-location ./node_modules/.cache/eslint .",
     "start": "dotenv -e .env remix-serve ./build/server/index.js",
-    "typecheck": "tsc"
+    "typecheck": "tsc",
+    "validate:standard-site": "dotenv -e .env node --experimental-strip-types scripts/validate-standard-site.ts"
   },
   "dependencies": {
     "@atproto/api": "^0.12.2",
@@ -30,6 +31,7 @@
     "@typescript-eslint/eslint-plugin": "^6.7.4",
     "@typescript-eslint/parser": "^6.7.4",
     "autoprefixer": "^10.4.19",
+    "dotenv-cli": "^11.0.0",
     "eslint": "^8.38.0",
     "eslint-config-prettier": "^9.1.0",
     "eslint-import-resolver-typescript": "^3.6.1",

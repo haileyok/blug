@@ -6,6 +6,9 @@ export const ATP_AGENT = new AtpAgent({
   service: ATP_SERVICE,
 })
 
+// The public AppView is used to fetch the author's Bluesky profile (avatar,
+// display name). Override with BSKY_APPVIEW_URL if you run your own AppView
+// or want to mock it in tests.
 export const BSKY_AGENT = new BskyAgent({
-  service: 'https://public.api.bsky.app/',
+  service: process.env.BSKY_APPVIEW_URL || 'https://public.api.bsky.app/',
 })

@@ -312,6 +312,22 @@ export interface OffprintDocument {
 /** A post record from the `site.standard.document` collection — Leaflet or Offprint. */
 export type Document = LeafletDocument | OffprintDocument
 
+// ---------------------------------------------------------------------------
+// site.standard.publication — the masthead record that ties this blog's
+// domain to its AT Protocol repo. See https://standard.site
+// ---------------------------------------------------------------------------
+
+export interface Publication {
+  $type: 'site.standard.publication'
+  /** Base url for the publication, e.g. https://example.com. No trailing slash. */
+  url: string
+  /** Name of the publication. */
+  name: string
+  description?: string
+  // not a part of the record, but we stick it in like rkey on documents
+  rkey?: string
+}
+
 export function isOffprintDocument(
   doc: Document,
 ): doc is OffprintDocument {

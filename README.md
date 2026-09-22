@@ -1,7 +1,38 @@
 # Blug - An ATProtocol Blog
 
-A simple little blog that pulls posts from your PDS, using the `pub.leaflet.document` lexicon. Uses Redis to keep them
+A simple little blog that pulls posts from your PDS, using the `site.standard.document` lexicon (the [standard.site](https://standard.site) long-form publishing schema). Uses Redis to keep them
 cached for a bit, in case you're popular and don't want to be constantly polling your PDS.
+
+## standard.site Compliance
+
+This blog implements the full [standard.site verification handshake](https://standard.site/docs/verification):
+
+- **`/.well-known/site.standard.publication`** — serves the AT-URI of your
+  `site.standard.publication` record as `text/plain`, tying your domain to the record.
+- **Document link tags** — every `/posts/{rkey}` page emits
+  `<link rel="site.standard.document" href="at://{DID}/site.standard.document/{rkey}">`
+  and `<link rel="site.standard.publication" href="...">`, so crawlers (including
+  Bluesky's enhanced link cards) can resolve posts back to their records.
+
+For this to validate, your repo needs the records — create them with whatever
+standard.site-compatible client you use (Leaflet, Offprint, pckt.blog, or
+[the quick start](https://standard.site/docs/quick-start)):
+
+1. A `site.standard.publication` record (rkey `self` is the convention) with
+   `url` set to your blog's origin — e.g. `https://your.blog`, **no trailing slash**.
+2. `site.standard.document` records with required fields `site`, `title`,
+   `publishedAt`, and `path` like `/posts/{rkey}` pointing at this blog's routes.
+
+Once the blog is running, validate the whole handshake end-to-end:
+
+```shell
+yarn validate:standard-site
+```
+
+The script checks the well-known endpoint, the publication record, every
+document record against the lexicon's required fields, and the link tags
+rendered on the post pages. It exits non-zero on any failure. Set `BASE_URL`
+to validate a deployed instance.
 
 ## Leaflet Support
 

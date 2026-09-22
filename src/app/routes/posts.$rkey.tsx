@@ -79,7 +79,7 @@ function postDescription(post: Document): string | undefined {
   return 'description' in post ? post.description : post.textContent
 }
 
-export const meta: MetaFunction<typeof loader> = ({data}) => {
+export const meta: MetaFunction<typeof loader> = ({data, params}) => {
   const post = data ? (data.post as unknown as Document) : undefined
   const {postText, ogImageUrl} =
     data && post
@@ -87,6 +87,24 @@ export const meta: MetaFunction<typeof loader> = ({data}) => {
       : {postText: '', ogImageUrl: undefined as string | undefined}
 
   const description = post ? postDescription(post) : undefined
+
+  // standard.site discovery tags — https://standard.site/docs/verification.
+  // Documents must link back to their AT-URI. The publication link tag is
+  // already emitted by root.tsx's `links` export on every page, so it isn't
+  // repeated here.
+  const did = data?.did
+  const rkey = params.rkey
+
+  const standardSiteLinks =
+    did && rkey
+      ? [
+          {
+            tagName: 'link',
+            rel: 'site.standard.document',
+            href: `at://${did}/site.standard.document/${rkey}`,
+          },
+        ]
+      : []
 
   return [
     {title: `${data?.post.title} | Hailey's Cool Site`},
@@ -96,12 +114,21 @@ export const meta: MetaFunction<typeof loader> = ({data}) => {
         ? description
         : `${postText.split(' ').slice(0, 100).join(' ')}...`,
     },
+    // OpenGraph properties must be rendered with property=, not name=.
     {
-      name: 'og:title',
+      property: 'og:title',
       content: `${data?.post.title}`,
     },
     {
-      name: 'og:description',
+      property: 'og:type',
+      content: 'article',
+    },
+    {
+      property: 'og:published_time',
+      content: post?.publishedAt,
+    },
+    {
+      property: 'og:description',
       content: description
         ? description
         : `${postText.split(' ').slice(0, 100).join(' ')}...`,
@@ -114,6 +141,7 @@ export const meta: MetaFunction<typeof loader> = ({data}) => {
           },
         ]
       : []),
+    ...standardSiteLinks,
   ]
 }
 
