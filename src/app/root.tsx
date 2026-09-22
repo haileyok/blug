@@ -9,9 +9,9 @@ import {
   useLocation,
   useRouteError,
 } from '@remix-run/react'
-import {json, LinksFunction} from '@remix-run/node'
+import {json, LinksFunction, MetaFunction} from '@remix-run/node'
 import styles from './tailwind.css?url'
-import {getProfile} from 'src/atproto'
+import {getProfile, getPublication} from 'src/atproto'
 import {AppBskyActorDefs} from '@atproto/api'
 
 export const links: LinksFunction = () => [
@@ -29,8 +29,30 @@ export const links: LinksFunction = () => [
 ]
 
 export const loader = async () => {
-  const profile = await getProfile()
-  return json({profile})
+  const [profile, publication] = await Promise.all([
+    getProfile(),
+    // Resolve the actual publication record so the discovery link tag
+    // advertises the discovered rkey, not a hard-coded guess. A PDS outage
+    // must not take the site down — fall back to the configured/default
+    // rkey for the tag.
+    getPublication().catch(() => null),
+  ])
+  return json({profile, publication})
+}
+
+export const meta: MetaFunction<typeof loader> = ({data}) => {
+  const did = process.env.ATP_DID
+  const rkey =
+    data?.publication?.rkey || process.env.ATP_PUBLICATION_RKEY || 'self'
+  return did
+    ? [
+        {
+          tagName: 'link',
+          rel: 'site.standard.publication',
+          href: `at://${did}/site.standard.publication/${rkey}`,
+        },
+      ]
+    : []
 }
 
 export function Layout({children}: {children: React.ReactNode}) {

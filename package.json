@@ -8,12 +8,13 @@
     "dev": "remix vite:dev",
     "lint": "eslint --ignore-path .gitignore --cache --cache-location ./node_modules/.cache/eslint .",
     "start": "dotenv -e .env remix-serve ./build/server/index.js",
-    "typecheck": "tsc"
+    "typecheck": "tsc",
+    "validate:standard-site": "dotenv -e .env tsx scripts/validate-standard-site.ts"
   },
   "dependencies": {
     "@atproto/api": "^0.12.2",
     "@remix-run/node": "^2.17.5",
-    "@remix-run/react": "^2.17.3",
+    "@remix-run/react": "2.17.5",
     "@remix-run/serve": "^2.17.5",
     "ioredis": "^5.3.2",
     "isbot": "^4.1.0",
@@ -30,6 +31,7 @@
     "@typescript-eslint/eslint-plugin": "^6.7.4",
     "@typescript-eslint/parser": "^6.7.4",
     "autoprefixer": "^10.4.19",
+    "dotenv-cli": "^11.0.0",
     "eslint": "^8.38.0",
     "eslint-config-prettier": "^9.1.0",
     "eslint-import-resolver-typescript": "^3.6.1",
@@ -41,6 +43,7 @@
     "postcss": "^8.4.38",
     "prettier": "^3.2.5",
     "tailwindcss": "^3.4.3",
+    "tsx": "^4.23.15",
     "typescript": "^5.1.6",
     "vite": "^7.3.5",
     "vite-tsconfig-paths": "^4.2.1"

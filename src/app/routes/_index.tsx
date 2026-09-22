@@ -26,8 +26,15 @@ export interface PostSummary {
   description: string
 }
 
-export const meta: MetaFunction = () => {
+export const meta: MetaFunction = ({matches}) => {
+  // Spread the parent (root) meta so the site.standard.publication link
+  // tag survives on this leaf route.
+  const parentMeta = matches
+    .flatMap(m => m.meta ?? [])
+    .filter(m => 'tagName' in m && m.tagName === 'link')
+
   return [
+    ...parentMeta,
     {title: "Hailey's Cool Site"},
     {
       name: 'description',

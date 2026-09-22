@@ -79,7 +79,14 @@ function postDescription(post: Document): string | undefined {
   return 'description' in post ? post.description : post.textContent
 }
 
-export const meta: MetaFunction<typeof loader> = ({data}) => {
+export const meta: MetaFunction<typeof loader> = ({data, params, matches}) => {
+  // Spread the parent (root) meta so the site.standard.publication link
+  // tag survives on this leaf route — leaf meta replaces parent meta
+  // unless it re-includes it.
+  const parentMeta = matches
+    .flatMap(m => m.meta ?? [])
+    .filter(m => 'tagName' in m && m.tagName === 'link')
+
   const post = data ? (data.post as unknown as Document) : undefined
   const {postText, ogImageUrl} =
     data && post
@@ -88,7 +95,26 @@ export const meta: MetaFunction<typeof loader> = ({data}) => {
 
   const description = post ? postDescription(post) : undefined
 
+  // standard.site discovery tags — https://standard.site/docs/verification.
+  // Documents must link back to their AT-URI. The publication link tag is
+  // already emitted by root.tsx's `links` export on every page, so it isn't
+  // repeated here.
+  const did = data?.did
+  const rkey = params.rkey
+
+  const standardSiteLinks =
+    did && rkey
+      ? [
+          {
+            tagName: 'link',
+            rel: 'site.standard.document',
+            href: `at://${did}/site.standard.document/${rkey}`,
+          },
+        ]
+      : []
+
   return [
+    ...parentMeta,
     {title: `${data?.post.title} | Hailey's Cool Site`},
     {
       name: 'description',
@@ -96,12 +122,21 @@ export const meta: MetaFunction<typeof loader> = ({data}) => {
         ? description
         : `${postText.split(' ').slice(0, 100).join(' ')}...`,
     },
+    // OpenGraph properties must be rendered with property=, not name=.
     {
-      name: 'og:title',
+      property: 'og:title',
       content: `${data?.post.title}`,
     },
     {
-      name: 'og:description',
+      property: 'og:type',
+      content: 'article',
+    },
+    {
+      property: 'article:published_time',
+      content: post?.publishedAt,
+    },
+    {
+      property: 'og:description',
       content: description
         ? description
         : `${postText.split(' ').slice(0, 100).join(' ')}...`,
@@ -114,6 +149,7 @@ export const meta: MetaFunction<typeof loader> = ({data}) => {
           },
         ]
       : []),
+    ...standardSiteLinks,
   ]
 }
 
@@ -429,6 +465,27 @@ function Image({block, did}: {block: LeafletImageBlock; did: string}) {
 }
 
 function Website({block, did}: {block: LeafletWebsiteBlock; did: string}) {
+  // A record's src is untrusted input: only http(s) URLs may become a
+  // clickable href, otherwise a javascript: (or other scheme) value in a
+  // published record would execute on click.
+  let safeSrc: string | null = null
+  try {
+    const parsed = new URL(block.src)
+    safeSrc =
+      parsed.protocol === 'http:' || parsed.protocol === 'https:'
+        ? parsed.toString()
+        : null
+  } catch {
+    safeSrc = null
+  }
+
+  if (!safeSrc) {
+    return (
+      <p className="text-400 mt-2 font-mono text-xs uppercase tracking-wider">
+        [unrenderable link: {block.src}]
+      </p>
+    )
+  }
   function PreviewImage() {
     if (!block.previewImage) {
       return null
@@ -446,11 +503,11 @@ function Website({block, did}: {block: LeafletWebsiteBlock; did: string}) {
 
   return (
     <a
-      href={block.src}
+      href={safeSrc}
       className="border border-100 rounded-md flex gap-4 p-4 bg-50 hover:bg-100 hover:border-300 transition-colors group my-2">
       <div className="flex-1 min-w-0">
         <h3 className="font-display text-lg md:text-xl text-950 truncate group-hover:text-600 transition-colors">
-          {block.title || block.src}
+          {block.title || safeSrc}
         </h3>
         {block.description ? (
           <p className="text-500 mt-1 line-clamp-2 font-sans text-sm">
@@ -458,13 +515,7 @@ function Website({block, did}: {block: LeafletWebsiteBlock; did: string}) {
           </p>
         ) : null}
         <p className="text-400 mt-2 font-mono text-xs uppercase tracking-wider truncate">
-          {(() => {
-            try {
-              return new URL(block.src).hostname.replace(/^www\./, '')
-            } catch {
-              return block.src
-            }
-          })()}
+          {new URL(safeSrc).hostname.replace(/^www\./, '')}
         </p>
       </div>
       <PreviewImage />

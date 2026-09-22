@@ -1,6 +1,6 @@
 import Redis from 'ioredis'
 import {AppBskyActorDefs} from '@atproto/api'
-import {Document} from '../types'
+import {Document, Publication} from '../types'
 
 export const REDIS_CLIENT = new Redis(
   process.env.REDIS_URL || 'redis://127.0.0.1:6379',
@@ -36,6 +36,26 @@ export const getCachedProfile = async () => {
     return null
   }
   return JSON.parse(res) as AppBskyActorDefs.ProfileViewDetailed
+}
+
+export const getCachedPublication = async (cacheKey: string) => {
+  const res = await REDIS_CLIENT.get(cacheKey)
+  if (!res) {
+    return null
+  }
+  return JSON.parse(res) as Publication
+}
+
+export const setCachedPublication = async (
+  cacheKey: string,
+  publication: Publication,
+) => {
+  await REDIS_CLIENT.set(
+    cacheKey,
+    JSON.stringify(publication),
+    'EX',
+    60 * 10,
+  )
 }
 
 export const setCachedProfile = async (
